@@ -1,12 +1,13 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TerminusModule } from '@nestjs/terminus';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { config, Env } from './config';
+import { HealthController } from './health/health.controller';
 
 @Module({
   imports: [
+    TerminusModule,
     ConfigModule.forRoot({
       isGlobal: true,
       load: [config],
@@ -19,7 +20,7 @@ import { config, Env } from './config';
       },
     }),
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [HealthController],
+  providers: [],
 })
 export class AppModule {}
