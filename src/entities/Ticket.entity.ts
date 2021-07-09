@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToMany, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { Hospital } from './Hospital.entity';
 import { Officer } from './Officer.entity';
 import { PrimaryGeneratedEntity } from './PrimaryGenerated.abstract';

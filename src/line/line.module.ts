@@ -4,6 +4,6 @@ import { LineController } from './line.controller';
 
 @Module({
   providers: [LineService],
-  controllers: [LineController]
+  controllers: [LineController],
 })
 export class LineModule {}
