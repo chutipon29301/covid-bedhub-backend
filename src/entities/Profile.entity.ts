@@ -1,19 +1,56 @@
-import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 import { PrimaryGeneratedEntity } from './PrimaryGenerated.abstract';
+import { Ticket } from './Ticket.entity';
 import { Patient } from './Patient.entity';
 
 @Entity()
 export class Profile extends PrimaryGeneratedEntity {
-  @Column()
-  lineId: string;
+  @Column('int')
+  userId: number;
 
   @Column()
-  defaultPatientId: number;
+  firstName: string;
 
-  @OneToMany(() => Patient, o => o.user)
-  patients?: Patient[];
+  @Column()
+  lastName: string;
 
-  @OneToOne(() => Patient, o => o.profile, { nullable: true })
-  @JoinColumn({ name: 'defaultPatientId', referencedColumnName: 'id' })
-  defaultPatient: Patient;
+  @Column('date')
+  birthDate: string;
+
+  @Column()
+  identification: string;
+
+  @Column()
+  subDistrict: string;
+
+  @Column()
+  district: string;
+
+  @Column()
+  province: string;
+
+  @Column()
+  zipCode: string;
+
+  @Column()
+  tel: string;
+
+  @Column()
+  sex: string;
+
+  @Column('numeric')
+  lat: number;
+
+  @Column('numeric')
+  lng: number;
+
+  @ManyToOne(() => Patient, o => o.profiles)
+  @JoinColumn({ name: 'userId', referencedColumnName: 'id' })
+  user?: Patient;
+
+  @OneToMany(() => Ticket, o => o.profile)
+  tickets?: Ticket[];
+
+  @OneToOne(() => Patient, o => o.defaultProfile, { nullable: true })
+  patient?: Patient;
 }
