@@ -4,10 +4,6 @@ import { HospitalService } from './hospital.service';
 import { CreateHospitalDto } from './dto/create-hospital.dto';
 import { UpdateHospitalDto } from './dto/update-hospital.dto';
 import { AccessCode } from 'src/entities/AccessCode.entity';
-import { UpdateCodeDto } from './dto/update-code.dto';
-import { UserToken } from 'src/decorators/user-token.decorator';
-import { JwtPayload } from 'src/jwt-auth/dto/jwt-auth.dto';
-import { AllowUnauthenticated } from 'src/decorators/allow-unauthenticated.decorator';
 @Controller('hospital')
 export class HospitalController {
   constructor(private readonly hospitalService: HospitalService) {}
@@ -18,16 +14,9 @@ export class HospitalController {
 
   @Post()
   async add(@Body() body: CreateHospitalDto): Promise<Hospital> {
+    console.log(body);
     return await this.hospitalService.createOne(body);
     // return await this.hospitalService.create(body);
-  }
-
-  @AllowUnauthenticated
-  @Post('/set-code')
-  async setCode(@UserToken() user: JwtPayload, @Body() body: UpdateCodeDto): Promise<Hospital> {
-    const user_id = 1;
-    // return await this.hospitalService.updateCode(user.id, body.userType, body.newCode);
-    return await this.hospitalService.updateCode(user_id, body.userType, body.newCode);
   }
 
   @Patch('/:id')
