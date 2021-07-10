@@ -23,6 +23,12 @@ export class Hospital extends PrimaryGeneratedEntity {
   @Column()
   tel: string;
 
+  @Column('numeric')
+  lat: number;
+
+  @Column('numeric')
+  lng: number;
+
   @Column({ unique: true })
   queueAccessCode: string;
 

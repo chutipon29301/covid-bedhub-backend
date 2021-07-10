@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from 'typeorm';
+import { Column, Double, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 import { PrimaryGeneratedEntity } from './PrimaryGenerated.abstract';
 import { Ticket } from './Ticket.entity';
 import { Patient } from './Patient.entity';
@@ -37,6 +37,12 @@ export class Profile extends PrimaryGeneratedEntity {
 
   @Column()
   sex: string;
+
+  @Column('numeric')
+  lat: number;
+
+  @Column('numeric')
+  lng: number;
 
   @ManyToOne(() => Patient, o => o.profiles)
   @JoinColumn({ name: 'userId', referencedColumnName: 'id' })
