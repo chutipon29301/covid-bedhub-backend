@@ -1,13 +1,14 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { NextFunction, Request, Response } from 'express';
-import { JwtPayload } from 'src/jwt-auth/dto/jwt-auth.dto';
-import { JwtAuthService } from 'src/jwt-auth/jwt-auth.service';
+import { JwtPayload } from '../jwt-auth/dto/jwt-auth.dto';
+import { JwtAuthService } from '../jwt-auth/jwt-auth.service';
 
 declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Express {
     interface Request {
       user?: JwtPayload;
+      token: string;
     }
   }
 }
@@ -15,27 +16,25 @@ declare global {
 @Injectable()
 export class AuthHeaderParserMiddleware implements NestMiddleware {
   constructor(private readonly jwtAuthService: JwtAuthService) {}
-  use(req: any, res: any, next: () => void) {
-    throw new Error('Method not implemented.');
-  }
 
-  resolve(...args: any[]) {
-    return (req: Request, res: Response, next: NextFunction) => {
-      try {
-        this.jwtAuthService
-          .decode(req.headers.authorization.split(' ')[1])
-          .then(token => {
-            req.user = token;
-            next();
-          })
-          .catch(error => {
-            req.user = null;
-            next();
-          });
-      } catch (error) {
-        req.user = null;
-        next();
+  async use(req: Request, res: Response, next: NextFunction) {
+    try {
+      const [tokenType, token] = (req.headers.authorization as string).split(' ');
+      switch (tokenType) {
+        case 'Bearer':
+          const user = await this.jwtAuthService.decode(token);
+          req.user = user;
+          req.token = token;
+          break;
+        default:
+          req.user = null;
+          req.token = token;
+          break;
       }
-    };
+    } catch (error) {
+      req.user = null;
+      req.token = null;
+    }
+    next();
   }
 }

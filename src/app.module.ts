@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TerminusModule } from '@nestjs/terminus';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
@@ -11,6 +11,10 @@ import { UserModule } from './user/user.module';
 import { LineModule } from './line/line.module';
 import { AuthModule } from './auth/auth.module';
 import { JwtAuthModule } from './jwt-auth/jwt-auth.module';
+import { AuthHeaderParserMiddleware } from './middleware/auth-header-parser.middleware';
+import { APP_GUARD } from '@nestjs/core';
+import { PermissionsGuard } from './guard/permission.guard';
+import { PingModule } from './ping/ping.module';
 
 @Module({
   imports: [
@@ -33,8 +37,18 @@ import { JwtAuthModule } from './jwt-auth/jwt-auth.module';
     LineModule,
     AuthModule,
     JwtAuthModule,
+    PingModule,
   ],
   controllers: [HealthController],
-  providers: [],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: PermissionsGuard,
+    },
+  ],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(AuthHeaderParserMiddleware).forRoutes('*');
+  }
+}
