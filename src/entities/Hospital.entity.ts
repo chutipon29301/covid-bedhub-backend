@@ -1,4 +1,5 @@
 import { Column, Entity, OneToMany } from 'typeorm';
+import { AccessCode } from './AccessCode.entity';
 import { Officer } from './Officer.entity';
 import { PrimaryGeneratedEntity } from './PrimaryGenerated.abstract';
 import { Ticket } from './Ticket.entity';
@@ -29,11 +30,8 @@ export class Hospital extends PrimaryGeneratedEntity {
   @Column('numeric')
   lng: number;
 
-  @Column({ unique: true })
-  queueAccessCode: string;
-
-  @Column({ unique: true })
-  staffAccessCode: string;
+  @OneToMany(() => AccessCode, o => o.hospital)
+  accessCodes?: AccessCode[];
 
   @OneToMany(() => Ticket, o => o.hospital)
   tickets?: Ticket[];
