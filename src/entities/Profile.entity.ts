@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 import { PrimaryGeneratedEntity } from './PrimaryGenerated.abstract';
 import { Ticket } from './Ticket.entity';
 import { Patient } from './Patient.entity';
@@ -44,4 +44,7 @@ export class Profile extends PrimaryGeneratedEntity {
 
   @OneToMany(() => Ticket, o => o.profile)
   tickets?: Ticket[];
+
+  @OneToOne(() => Patient, o => o.defaultProfile, { nullable: true })
+  patient?: Patient;
 }

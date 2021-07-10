@@ -7,8 +7,10 @@ import { HealthController } from './health/health.controller';
 import { HospitalModule } from './hospital/hospital.module';
 import { ProfileModule } from './profile/profile.module';
 import { TicketModule } from './ticket/ticket.module';
-import { LineModule } from './line/line.module';
 import { UserModule } from './user/user.module';
+import { LineModule } from './line/line.module';
+import { AuthModule } from './auth/auth.module';
+import { JwtAuthModule } from './jwt-auth/jwt-auth.module';
 
 @Module({
   imports: [
@@ -27,8 +29,10 @@ import { UserModule } from './user/user.module';
     HospitalModule,
     ProfileModule,
     TicketModule,
-    LineModule,
     UserModule,
+    LineModule,
+    AuthModule,
+    JwtAuthModule,
   ],
   controllers: [HealthController],
   providers: [],

@@ -10,4 +10,14 @@ export class UserService {
     @InjectRepository(Officer) private readonly officerRepo: Repository<Officer>,
     @InjectRepository(Patient) private readonly patientRepo: Repository<Patient>,
   ) {}
+
+  async ensurePatient(lineId: string): Promise<Patient> {
+    const patient = await this.patientRepo.findOne({ where: { lineId }, relations: ['defaultProfile'] });
+    if (patient) {
+      return patient;
+    }
+    const newPatient = new Patient();
+    newPatient.lineId = lineId;
+    return this.patientRepo.create(newPatient);
+  }
 }
