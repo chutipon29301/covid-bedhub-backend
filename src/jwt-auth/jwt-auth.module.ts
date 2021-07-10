@@ -10,7 +10,7 @@ import { JwtAuthService } from './jwt-auth.service';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService<Env>) => ({
-        secretOrPrivateKey: configService.get('lineChannelSecret'),
+        secret: configService.get('lineChannelSecret'),
       }),
     }),
   ],
