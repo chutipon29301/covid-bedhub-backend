@@ -22,4 +22,22 @@ export class PingController {
   pingPatient() {
     return { msg: 'pong' };
   }
+
+  @Roles('staff')
+  @Get('staff')
+  pingStaff() {
+    return { msg: 'pong' };
+  }
+
+  @Roles('queue_manager')
+  @Get('queue-manager')
+  pingQueueManager() {
+    return { msg: 'pong' };
+  }
+
+  @Roles('code_generator')
+  @Get('code-generator')
+  pingCodeGenerator() {
+    return { msg: 'pong' };
+  }
 }
