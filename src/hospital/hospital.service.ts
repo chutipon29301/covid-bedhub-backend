@@ -1,14 +1,12 @@
 import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AccessCode, UserType } from '../entities/AccessCode.entity';
 import { Repository } from 'typeorm';
-import { Hospital } from '../entities/Hospital.entity';
-import { CrudService } from '../libs/crud.service';
 import { nanoid } from 'nanoid';
-import { CreateHospitalDto } from './dto/create-hospital.dto';
-import { UpdateCodeDto } from './dto/update-code.dto';
-import { log } from 'console';
-import { Officer } from '../entities/Officer.entity';
+
+import { CrudService } from '../libs/crud.service';
+import { CreateHospitalDto } from './dto/hospital.dto';
+import { AccessCode, Officer, UserType, Hospital } from '../entities';
+
 @Injectable()
 export class HospitalService extends CrudService<Hospital> {
   constructor(

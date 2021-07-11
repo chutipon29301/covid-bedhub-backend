@@ -1,16 +1,15 @@
 import { HttpService, Injectable, UnauthorizedException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { Env } from '../config';
 import { LineAccessToken, LineAccessTokenRequestResponse, LineToken, State } from './dto/line.dto';
 import { AES, enc } from 'crypto-js';
 import { stringify } from 'qs';
 import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '../types';
 
 @Injectable()
 export class LineService {
   private readonly passPhase = 'COVID';
   constructor(
-    private readonly configService: ConfigService<Env>,
+    private readonly configService: ConfigService,
     private readonly httpService: HttpService,
     private readonly jwtService: JwtService,
   ) {}
