@@ -82,6 +82,13 @@ Authentication in development environment
 }
 ```
 
+Available account type are:
+
+- patient
+- staff
+- queue_manager
+- code_generator
+
 Authentication in production environment
 
 ```json
