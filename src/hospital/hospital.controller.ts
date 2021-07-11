@@ -6,6 +6,7 @@ import { AllowUnauthenticated } from '../decorators/allow-unauthenticated.decora
 import { HospitalService } from './hospital.service';
 import { CreateHospitalDto, UpdateCodeDto, UpdateHospitalDto } from './dto/hospital.dto';
 import { Hospital } from '../entities';
+import { IdParam } from '../decorators/id.decorator';
 
 @Controller('hospital')
 export class HospitalController {
@@ -30,12 +31,12 @@ export class HospitalController {
   }
 
   @Patch('/:id')
-  async edit(@Param('id', new ParseIntPipe()) id: number, @Body() hospital: UpdateHospitalDto) {
+  async edit(@IdParam() id: number, @Body() hospital: UpdateHospitalDto) {
     return this.hospitalService.updateOne({ id }, hospital);
   }
 
   @Delete('/:id')
-  async delete(@Param('id', new ParseIntPipe()) id: number) {
+  async delete(@IdParam() id: number) {
     await this.hospitalService.deleteOne({
       where: { id },
     });

@@ -3,6 +3,7 @@ import { PatientService } from './Patient.service';
 import { CreatePatientDto } from './dto/create-patient.dto';
 import { UpdatePatientDto } from './dto/update-patient.dto';
 import { Patient } from '../entities/Patient.entity';
+import { IdParam } from '../decorators/id.decorator';
 
 @Controller('Patient')
 export class PatientController {
@@ -19,12 +20,12 @@ export class PatientController {
   }
 
   @Patch('/:id')
-  async edit(@Param('id', new ParseIntPipe()) id: number, @Body() Patient: UpdatePatientDto) {
+  async edit(@IdParam() id: number, @Body() Patient: UpdatePatientDto) {
     return this.patientService.updateOne({ id }, Patient);
   }
 
   @Delete('/:id')
-  async delete(@Param('id', new ParseIntPipe()) id: number) {
+  async delete(@IdParam() id: number) {
     await this.patientService.deleteOne({
       where: { id },
     });
