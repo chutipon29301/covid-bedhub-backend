@@ -1,6 +1,7 @@
 import { HttpModule, Module } from '@nestjs/common';
-import { ConfigService } from '../types';
 import { JwtModule } from '@nestjs/jwt';
+
+import { ConfigService } from '../types';
 import { LineService } from './line.service';
 
 @Module({
