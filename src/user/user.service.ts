@@ -30,7 +30,6 @@ export class UserService {
       if (hospital) {
         const officer = await this.officerRepo.create(user);
         await this.officerRepo.save(officer);
-        console.log(officer, user);
         return officer;
       }
       throw new Error('Hospital not found');

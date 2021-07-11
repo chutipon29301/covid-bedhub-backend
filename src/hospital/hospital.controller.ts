@@ -25,7 +25,6 @@ export class HospitalController {
   @AllowUnauthenticated
   @Post('/set-code')
   async setCode(@UserToken() user: JwtPayload, @Body() body: UpdateCodeDto): Promise<Hospital> {
-    console.log(body);
     const user_id = 1;
     // return await this.hospitalService.updateCode(user.id, body.userType, body.newCode);
     return await this.hospitalService.updateCode(user_id, body.userType, body.newCode);

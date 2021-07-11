@@ -29,7 +29,6 @@ export class HospitalService extends CrudService<Hospital> {
     const hospital = await this.create(body);
     staffAccessCode.hospitalId = hospital.id;
     queueAccessCode.hospitalId = hospital.id;
-    console.log(hospital);
     await this.accessCodeRepo.save([staffAccessCode, queueAccessCode]);
     return hospital;
   }
