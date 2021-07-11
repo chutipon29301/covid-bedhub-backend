@@ -13,6 +13,9 @@ export class PermissionsGuard implements CanActivate {
     if (allowUnauthenticated) return true;
 
     const request = context.switchToHttp().getRequest() as Request;
+    if (process.env.NODE_ENV !== 'production' && request.authenticationType === 'development') {
+      return false;
+    }
     if (!request?.user) return false;
 
     const allowAnyPermission = this.reflector.get<boolean>('allow-any-permissions', context.getHandler());

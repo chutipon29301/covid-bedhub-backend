@@ -1,6 +1,6 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import { NextFunction, Request, Response } from 'express';
-import { JwtPayload } from '../jwt-auth/dto/jwt-auth.dto';
+import { AccountType, JwtPayload } from '../jwt-auth/dto/jwt-auth.dto';
 import { JwtAuthService } from '../jwt-auth/jwt-auth.service';
 
 declare global {
@@ -9,6 +9,7 @@ declare global {
     interface Request {
       user?: JwtPayload;
       token: string;
+      authenticationType: 'production' | 'development';
     }
   }
 }
@@ -25,6 +26,16 @@ export class AuthHeaderParserMiddleware implements NestMiddleware {
           const user = await this.jwtAuthService.decode(token);
           req.user = user;
           req.token = token;
+          req.authenticationType = 'production';
+          break;
+        case 'Developer':
+          const [accountType, id] = token.split('-') as [AccountType, string];
+          req.user = {
+            accountType,
+            id: +id,
+          };
+          req.token = token;
+          req.authenticationType = 'development';
           break;
         default:
           req.user = null;
