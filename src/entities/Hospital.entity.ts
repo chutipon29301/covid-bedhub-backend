@@ -24,11 +24,14 @@ export class Hospital extends PrimaryGeneratedEntity {
   @Column()
   tel: string;
 
-  @Column('numeric')
-  lat: number;
+  @Column('point')
+  location: any;
 
-  @Column('numeric')
-  lng: number;
+  // @Column('numeric')
+  // lat: number;
+
+  // @Column('numeric')
+  // lng: number;
 
   @OneToMany(() => AccessCode, o => o.hospital)
   accessCodes?: AccessCode[];
