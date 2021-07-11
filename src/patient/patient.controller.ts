@@ -1,10 +1,9 @@
 import { Body, Controller, Delete, Get, Patch, Post } from '@nestjs/common';
-import { PatientService } from './patient.service';
-import { CreatePatientDto } from './dto/create-patient.dto';
-import { UpdatePatientDto } from './dto/update-patient.dto';
-import { Patient } from '../entities/Patient.entity';
 import { IdParam } from '../decorators/id.decorator';
 import { AllowUnauthenticated } from '../decorators/allow-unauthenticated.decorator';
+import { PatientService } from './patient.service';
+import { CreatePatientDto, UpdatePatientDto } from './dto/patient.dto';
+import { Patient } from '../entities';
 
 @Controller('patient')
 export class PatientController {
@@ -20,7 +19,6 @@ export class PatientController {
   async add(@Body() body: CreatePatientDto): Promise<Patient> {
     body.userId = 1;
     return await this.patientService.create(body);
-    // return await this.patientService.create(body);
   }
 
   @Patch('/:id')
