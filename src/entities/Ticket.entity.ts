@@ -15,7 +15,7 @@ export enum TicketStatus {
 @Entity()
 export class Ticket extends PrimaryGeneratedEntity {
   @Column()
-  profileId: number;
+  patientId: number;
 
   @Column('date')
   examReceiveDate: string;
@@ -50,7 +50,7 @@ export class Ticket extends PrimaryGeneratedEntity {
   updatedById?: number;
 
   @ManyToOne(() => Patient, o => o.tickets)
-  @JoinColumn({ name: 'profileId', referencedColumnName: 'id' })
+  @JoinColumn({ name: 'patientId', referencedColumnName: 'id' })
   patient?: Patient;
 
   @ManyToOne(() => Hospital, o => o.tickets)

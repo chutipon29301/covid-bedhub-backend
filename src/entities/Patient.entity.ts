@@ -38,6 +38,9 @@ export class Patient extends PrimaryGeneratedEntity {
   @Column()
   sex: string;
 
+  @Column('int', { nullable: true })
+  riskLevel: number;
+
   @Column('numeric')
   lat: number;
 
