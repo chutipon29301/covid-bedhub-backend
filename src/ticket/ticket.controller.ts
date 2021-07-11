@@ -3,7 +3,7 @@ import { UserToken } from '../decorators/user-token.decorator';
 import { JwtPayload } from '../jwt-auth/dto/jwt-auth.dto';
 import { AllowUnauthenticated } from '../decorators/allow-unauthenticated.decorator';
 import { IdParam } from '../decorators/id.decorator';
-import { Ticket } from '../entities/Ticket.entity';
+import { Ticket, TicketStatus } from '../entities/Ticket.entity';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 import { UpdateTicketDto } from './dto/update-ticket.dto';
 import { TicketService } from './ticket.service';
@@ -27,6 +27,14 @@ export class TicketController {
   @Patch('/:id')
   async edit(@IdParam() id: number, @Body() Ticket: UpdateTicketDto) {
     return this.ticketService.updateOne({ id }, Ticket);
+  }
+
+  @AllowUnauthenticated
+  @Patch('/cancel/:id')
+  async cancel(@IdParam() id: number) {
+    const cancelTicket = new Ticket();
+    cancelTicket.status = TicketStatus.PATIENT_CANCEL;
+    return this.ticketService.updateOne({ id }, cancelTicket);
   }
 
   @Delete('/:id')
