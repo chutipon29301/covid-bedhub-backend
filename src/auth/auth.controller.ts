@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Post, Query, Res, UnauthorizedException } from '@nestjs/common';
 import { Response } from 'express';
+import { AllowUnauthenticated } from '../decorators/allow-unauthenticated.decorator';
 import { JwtTokenInfo } from '../jwt-auth/dto/jwt-auth.dto';
 import { AuthService } from './auth.service';
 import { RequestTokenDto } from './dto/auth.dto';
@@ -8,11 +9,13 @@ import { RequestTokenDto } from './dto/auth.dto';
 export class AuthController {
   constructor(private readonly service: AuthService) {}
 
+  @AllowUnauthenticated
   @Get('/login')
   loginWithLine(@Res() res: Response) {
     res.redirect(this.service.getLineAuthenticationPageURL());
   }
 
+  @AllowUnauthenticated
   @Get('line/callback')
   async lineCallback(
     @Query('code') code: string,
@@ -32,6 +35,7 @@ export class AuthController {
     }
   }
 
+  @AllowUnauthenticated
   @Post('line/token')
   async lineAdminAuthToken(@Body() body: RequestTokenDto): Promise<JwtTokenInfo> {
     const accessToken = await this.service.getAccessToken(body.code);
