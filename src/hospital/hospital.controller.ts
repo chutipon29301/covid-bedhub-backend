@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Patch, Post } from '@nestjs/common';
 
 import { UserToken } from '../decorators/user-token.decorator';
 import { JwtPayload } from '../jwt-auth/dto/jwt-auth.dto';

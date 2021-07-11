@@ -1,10 +1,9 @@
 import { HttpService, Injectable, UnauthorizedException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { stringify } from 'qs';
-import { Env } from '../config';
 import { JwtTokenInfo } from '../jwt-auth/dto/jwt-auth.dto';
 import { JwtAuthService } from '../jwt-auth/jwt-auth.service';
 import { LineService } from '../line/line.service';
+import { ConfigService } from '../types';
 import { UserService } from '../user/user.service';
 import { LineAccessToken, LineAccessTokenRequestResponse } from './dto/auth.dto';
 
@@ -14,7 +13,7 @@ export class AuthService {
 
   constructor(
     private readonly lineService: LineService,
-    private readonly configService: ConfigService<Env>,
+    private readonly configService: ConfigService,
     private readonly httpService: HttpService,
     private readonly userService: UserService,
     private readonly jwtAuthService: JwtAuthService,

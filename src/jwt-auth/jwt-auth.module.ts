@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
-import { Env } from '../config';
+
+import { ConfigService } from '../types';
 import { JwtAuthService } from './jwt-auth.service';
 
 @Module({
@@ -9,7 +10,7 @@ import { JwtAuthService } from './jwt-auth.service';
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: async (configService: ConfigService<Env>) => ({
+      useFactory: async (configService: ConfigService) => ({
         secret: configService.get('lineChannelSecret'),
       }),
     }),

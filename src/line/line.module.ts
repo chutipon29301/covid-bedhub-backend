@@ -1,7 +1,6 @@
 import { HttpModule, Module } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { ConfigService } from '../types';
 import { JwtModule } from '@nestjs/jwt';
-import { Env } from '../config';
 import { LineService } from './line.service';
 
 @Module({
@@ -9,7 +8,7 @@ import { LineService } from './line.service';
     HttpModule,
     JwtModule.registerAsync({
       inject: [ConfigService],
-      useFactory: async (configService: ConfigService<Env>) => ({
+      useFactory: async (configService: ConfigService) => ({
         secretOrPrivateKey: configService.get('lineChannelSecret'),
         signOptions: {
           algorithm: 'HS256',
