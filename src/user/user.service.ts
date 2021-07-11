@@ -13,7 +13,7 @@ export class UserService {
   ) {}
 
   async ensureProfile(lineId: string): Promise<Profile> {
-    const profile = await this.profileRepo.findOne({ where: { lineId }, relations: ['defaultProfile'] });
+    const profile = await this.profileRepo.findOne({ where: { lineId }, relations: ['defaultPatient'] });
     if (profile) {
       return profile;
     }
