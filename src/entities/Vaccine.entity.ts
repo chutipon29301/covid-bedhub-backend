@@ -28,7 +28,6 @@ export class Vaccine extends PrimaryGeneratedEntity {
   @Column({
     type: 'enum',
     enum: VaccineName,
-    nullable: true,
   })
   vaccineName: VaccineName;
 
