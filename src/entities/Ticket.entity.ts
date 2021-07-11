@@ -43,6 +43,9 @@ export class Ticket extends PrimaryGeneratedEntity {
   @Column()
   patientId: number;
 
+  @Column()
+  vaccineId: number;
+
   @Column('date')
   examReceiveDate: string;
 
