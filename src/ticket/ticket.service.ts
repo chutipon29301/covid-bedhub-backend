@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Vaccine } from 'src/entities/Vaccine.entity';
+import { Vaccine } from '../entities/Vaccine.entity';
 import { Repository } from 'typeorm';
 import { Ticket } from '../entities/Ticket.entity';
 import { CrudService } from '../libs/crud.service';
