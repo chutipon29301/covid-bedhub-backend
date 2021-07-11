@@ -10,6 +10,7 @@ import { TicketModule } from './ticket/ticket.module';
 import { UserModule } from './user/user.module';
 import { LineModule } from './line/line.module';
 import { AuthModule } from './auth/auth.module';
+import { InviteModule } from './invite/invite.module';
 import { JwtAuthModule } from './jwt-auth/jwt-auth.module';
 import { AuthHeaderParserMiddleware } from './middleware/auth-header-parser.middleware';
 import { APP_GUARD } from '@nestjs/core';
@@ -38,6 +39,7 @@ import { PingModule } from './ping/ping.module';
     AuthModule,
     JwtAuthModule,
     PingModule,
+    InviteModule,
   ],
   controllers: [HealthController],
   providers: [
