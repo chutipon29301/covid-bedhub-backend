@@ -24,8 +24,8 @@ export class Hospital extends PrimaryGeneratedEntity {
   @Column()
   tel: string;
 
-  @Column('point')
-  location: any;
+  // @Column('point')
+  // location: any;
 
   // @Column('numeric')
   // lat: number;
