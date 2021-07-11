@@ -7,7 +7,7 @@ export class Profile extends PrimaryGeneratedEntity {
   @Column()
   lineId: string;
 
-  @Column()
+  @Column({ nullable: true })
   defaultPatientId: number;
 
   @OneToMany(() => Patient, o => o.user)
