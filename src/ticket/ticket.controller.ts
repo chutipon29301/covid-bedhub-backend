@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Patch, Post } from '@nestjs/common';
-import { AllowUnauthenticated } from '../decorators/allow-unauthenticated.decorator';
-import { IdParam } from '../decorators/id.decorator';
+import { AllowUnauthenticated } from 'src/decorators/allow-unauthenticated.decorator';
+import { IdParam } from 'src/decorators/id.decorator';
 import { Ticket } from '../entities/Ticket.entity';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 import { UpdateTicketDto } from './dto/update-ticket.dto';
