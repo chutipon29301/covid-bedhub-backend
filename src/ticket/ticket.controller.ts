@@ -1,5 +1,4 @@
-import { AllowAnyPermission } from '../decorators/allow-any-permission.decorator';
-import { Body, Controller, Delete, Get, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, InternalServerErrorException, Patch, Post } from '@nestjs/common';
 import { UserToken } from '../decorators/user-token.decorator';
 import { JwtPayload } from '../jwt-auth/dto/jwt-auth.dto';
 import { AllowUnauthenticated } from '../decorators/allow-unauthenticated.decorator';
@@ -8,6 +7,7 @@ import { Ticket, TicketStatus } from '../entities/Ticket.entity';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 import { UpdateTicketDto } from './dto/update-ticket.dto';
 import { TicketService } from './ticket.service';
+import { differenceInDays, parseISO } from 'date-fns';
 
 @Controller('ticket')
 export class TicketController {
@@ -33,9 +33,29 @@ export class TicketController {
   @AllowUnauthenticated
   @Patch('/cancel/:id')
   async cancel(@IdParam() id: number) {
-    const cancelTicket = new Ticket();
-    cancelTicket.status = TicketStatus.PATIENT_CANCEL;
-    return this.ticketService.updateOne({ id }, cancelTicket);
+    const currentTicket = await this.ticketService.findOne({ id });
+    switch (currentTicket.status) {
+      case TicketStatus.REQUEST:
+        currentTicket.status = TicketStatus.PATIENT_CANCEL;
+        return this.ticketService.updateOne({ id }, currentTicket);
+      case TicketStatus.ACCEPTED:
+        if (currentTicket.appointedDate) {
+          const dateDiff = differenceInDays(parseISO(currentTicket.appointedDate), new Date());
+          if (dateDiff <= 3) {
+            throw new InternalServerErrorException('Ticket cannot be cancelled within 3 days');
+          }
+          console.log(dateDiff);
+          currentTicket.status = TicketStatus.PATIENT_CANCEL;
+          return this.ticketService.updateOne({ id }, currentTicket);
+        }
+        throw new InternalServerErrorException('No appointment date'); // To be discusss
+      case TicketStatus.PATIENT_CANCEL:
+        throw new InternalServerErrorException('Ticket already cancelled by the patient');
+      case TicketStatus.HOSPITAL_CANCEL:
+        throw new InternalServerErrorException('Ticket already cancelled by the hospital');
+      default:
+        throw new InternalServerErrorException('Cannot cancelled ticket');
+    }
   }
 
   @Delete('/:id')
