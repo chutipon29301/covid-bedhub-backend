@@ -19,12 +19,16 @@ export class Vaccine extends PrimaryGeneratedEntity {
   @Column('date')
   vaccineReceiveDate: string;
 
+  @Column('date')
+  examDate: string;
+
   @Column('int')
   doseNumber: number;
 
   @Column({
     type: 'enum',
     enum: VaccineName,
+    nullable: true,
   })
   vaccineName: VaccineName;
 
