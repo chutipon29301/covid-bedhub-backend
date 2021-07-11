@@ -9,7 +9,7 @@ import { AllowUnauthenticated } from '../decorators/allow-unauthenticated.decora
 @Controller('patient')
 export class PatientController {
   constructor(private readonly patientService: PatientService) {}
-
+  @AllowUnauthenticated
   @Get()
   async list(): Promise<Patient[]> {
     return this.patientService.findMany();

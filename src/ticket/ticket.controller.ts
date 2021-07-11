@@ -18,7 +18,6 @@ export class TicketController {
   @AllowUnauthenticated
   @Post()
   async add(@Body() body: CreateTicketDto): Promise<Ticket> {
-    body.patientId = 1;
     return await this.ticketService.createOne(body);
     // return await this.ticketService.create(body);
   }

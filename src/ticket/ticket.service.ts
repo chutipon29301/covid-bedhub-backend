@@ -1,32 +1,52 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Vaccine } from '../entities/Vaccine.entity';
-import { Repository } from 'typeorm';
-import { Ticket } from '../entities/Ticket.entity';
+import { In, Repository } from 'typeorm';
+import { Symptom, Ticket, TicketStatus } from '../entities/Ticket.entity';
 import { CrudService } from '../libs/crud.service';
 import { CreateTicketDto } from './dto/create-ticket.dto';
-
-//   FEVER = 'ไข้ หรือวัดอุณหภูมิได้ตั้งแต่ 37.5 องศาขึ้นไป', // 1
-//   COUGH = 'ไอ มีน้ำมูก เจ็บคอ', // 1
-//   SMELLESS_RASH = 'ไม่ได้กลิ่น ลิ้นไม่รับรส ตาแดง ผื่น', // 1
-//   DIARRHEA = 'ถ่ายเหลวมากกว่า 3 ครั้งต่อวัน', //2
-//   TIRED_HEADACHE = 'อ่อนเพลีย หน้ามืด วิงเวียนศีรษะ', //2
-//   DIFFICULT_BREATHING = 'หายใจเร็ว, หายใจลำบาก หรือเหนื่อย', //2
-//   ANGINA = 'แน่นหน้าอกเล็กน้อย', //2
-//   EXHAUSTED = 'หอบเหนื่อย พูดไม่เป็นประโยคขณะสนทนา', //3
-//   CHEST_PAIN = 'แน่นหน้าอกตลอดเวลา หายใจแล้วเจ็บหน้าอก', //3
-//   UNCONCIOUS = 'เรียกไม่รู้สึกตัว หรือตอบสนองช้า', //3
 
 @Injectable()
 export class TicketService extends CrudService<Ticket> {
   constructor(
-    @InjectRepository(Vaccine) vaccineRepo: Repository<Vaccine>,
+    @InjectRepository(Vaccine) private readonly vaccineRepo: Repository<Vaccine>,
     @InjectRepository(Ticket) repo: Repository<Ticket>,
   ) {
     super(repo);
   }
   public async createOne(body: CreateTicketDto): Promise<Ticket> {
     // body.
-    return;
+    const existingTicket = await this.repo.find({
+      where: {
+        patientId: body.patientId,
+        status: In([TicketStatus.ACCEPTED, TicketStatus.MATCH, TicketStatus.REQUEST]),
+      },
+    });
+    console.log('existing', existingTicket);
+    if (existingTicket.length > 0) {
+      throw new InternalServerErrorException('Patient already create ticket');
+    }
+    const ticket = new Ticket();
+    ticket.patientId = body.patientId;
+    ticket.examReceiveDate = body.examReceiveDate;
+    ticket.examDate = body.examDate;
+    ticket.symptoms = body.symptoms;
+    const risk1 = [Symptom.FEVER, Symptom.COUGH, Symptom.SMELLESS_RASH];
+    const risk2 = [Symptom.DIARRHEA, Symptom.TIRED_HEADACHE, Symptom.DIFFICULT_BREATHING, Symptom.ANGINA];
+    const risk3 = [Symptom.EXHAUSTED, Symptom.CHEST_PAIN, Symptom.UNCONCIOUS];
+    const risks = [risk3, risk2, risk1];
+    for (const [index, riskFactors] of risks.entries()) {
+      const found = body.symptoms.filter(value => riskFactors.includes(value));
+      if (found.length > 0) {
+        ticket.riskLevel = risks.length - index;
+        break;
+      }
+    }
+    const newTicket = await this.create(ticket);
+    body.vaccines.forEach(async vaccine => {
+      vaccine.ticketId = newTicket.id;
+    });
+    await this.vaccineRepo.save(body.vaccines);
+    return newTicket;
   }
 }
