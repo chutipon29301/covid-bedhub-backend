@@ -1,8 +1,9 @@
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { Hospital } from './Hospital.entity';
 import { Officer } from './Officer.entity';
 import { Patient } from './Patient.entity';
 import { PrimaryGeneratedEntity } from './PrimaryGenerated.abstract';
+import { Vaccine } from './Vaccine.entity';
 
 export enum TicketStatus {
   REQUEST = 'REQUEST', // Patient create ticket
@@ -16,6 +17,9 @@ export enum TicketStatus {
 export class Ticket extends PrimaryGeneratedEntity {
   @Column()
   patientId: number;
+
+  @Column()
+  vaccineId: number;
 
   @Column('date')
   examReceiveDate: string;
@@ -51,6 +55,9 @@ export class Ticket extends PrimaryGeneratedEntity {
     nullable: true,
   })
   updatedById?: number;
+
+  @OneToMany(() => Vaccine, o => o.ticket)
+  vaccines?: Vaccine[];
 
   @ManyToOne(() => Patient, o => o.tickets)
   @JoinColumn({ name: 'patientId', referencedColumnName: 'id' })
