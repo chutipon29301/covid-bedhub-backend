@@ -32,14 +32,14 @@ export class AuthService {
     return `${this.configService.get('frontendURL')}/login?code=${accessCode}`;
   }
 
-  async getPatientJwtTokenFromLineToken(lineToken: string): Promise<JwtTokenInfo> {
+  async getProfileJwtTokenFromLineToken(lineToken: string): Promise<JwtTokenInfo> {
     const decodedLineToken = this.lineService.decode(lineToken);
     if (decodedLineToken) {
-      const patient = await this.userService.ensurePatient(decodedLineToken.sub);
+      const profile = await this.userService.ensureProfile(decodedLineToken.sub);
       return this.jwtAuthService.sign({
-        id: patient.id,
-        accountType: 'patient',
-        hasProfile: !!patient.profiles,
+        id: profile.id,
+        accountType: 'profile',
+        hasProfile: !!profile.patients,
       });
     } else {
       throw new UnauthorizedException('Invalid line token');

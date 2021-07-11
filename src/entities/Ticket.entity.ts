@@ -1,8 +1,8 @@
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { Hospital } from './Hospital.entity';
 import { Officer } from './Officer.entity';
+import { Patient } from './Patient.entity';
 import { PrimaryGeneratedEntity } from './PrimaryGenerated.abstract';
-import { Profile } from './Profile.entity';
 
 export enum TicketStatus {
   REQUEST = 'REQUEST', // Patient create ticket
@@ -49,9 +49,9 @@ export class Ticket extends PrimaryGeneratedEntity {
   })
   updatedById?: number;
 
-  @ManyToOne(() => Profile, o => o.tickets)
+  @ManyToOne(() => Patient, o => o.tickets)
   @JoinColumn({ name: 'profileId', referencedColumnName: 'id' })
-  profile?: Profile;
+  patient?: Patient;
 
   @ManyToOne(() => Hospital, o => o.tickets)
   @JoinColumn({ name: 'hospitalId', referencedColumnName: 'id' })
