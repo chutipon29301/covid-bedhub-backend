@@ -1,8 +1,9 @@
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { Hospital } from './Hospital.entity';
 import { Officer } from './Officer.entity';
 import { Patient } from './Patient.entity';
 import { PrimaryGeneratedEntity } from './PrimaryGenerated.abstract';
+import { Vaccine } from './Vaccine.entity';
 
 export enum TicketStatus {
   REQUEST = 'REQUEST', // Patient create ticket
@@ -12,6 +13,18 @@ export enum TicketStatus {
   PATIENT_CANCEL = 'PATIENT_CANCEL',
 }
 
+export enum Symptom {
+  FEVER = 'FEVER', // 1
+  COUGH = 'COUGH', // 1
+  SMELLESS_RASH = 'SMELLESS_RASH', // 1
+  DIARRHEA = 'DIARRHEA', //2
+  TIRED_HEADACHE = 'TIRED_HEADACHE', //2
+  DIFFICULT_BREATHING = 'DIFFICULT_BREATHING', //2
+  ANGINA = 'ANGINA', //2
+  EXHAUSTED = 'EXHAUSTED', //3
+  CHEST_PAIN = 'CHEST_PAIN', //3
+  UNCONCIOUS = 'UNCONCIOUS', //3
+}
 @Entity()
 export class Ticket extends PrimaryGeneratedEntity {
   @Column()
@@ -23,8 +36,12 @@ export class Ticket extends PrimaryGeneratedEntity {
   @Column('date')
   examDate: string;
 
-  @Column()
-  symptom: string;
+  @Column({
+    type: 'enum',
+    enum: Symptom,
+    array: true,
+  })
+  symptom: Symptom[];
 
   @Column({
     type: 'enum',
@@ -51,6 +68,9 @@ export class Ticket extends PrimaryGeneratedEntity {
     nullable: true,
   })
   updatedById?: number;
+
+  @OneToMany(() => Vaccine, o => o.ticket)
+  vaccines?: Vaccine[];
 
   @ManyToOne(() => Patient, o => o.tickets)
   @JoinColumn({ name: 'patientId', referencedColumnName: 'id' })
