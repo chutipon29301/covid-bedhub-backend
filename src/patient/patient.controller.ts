@@ -3,8 +3,9 @@ import { PatientService } from './Patient.service';
 import { CreatePatientDto } from './dto/create-patient.dto';
 import { UpdatePatientDto } from './dto/update-patient.dto';
 import { Patient } from '../entities/Patient.entity';
+import { AllowUnauthenticated } from '../decorators/allow-unauthenticated.decorator';
 
-@Controller('Patient')
+@Controller('patient')
 export class PatientController {
   constructor(private readonly patientService: PatientService) {}
 
@@ -13,9 +14,12 @@ export class PatientController {
     return this.patientService.findMany();
   }
 
+  @AllowUnauthenticated
   @Post()
   async add(@Body() body: CreatePatientDto): Promise<Patient> {
-    return await this.patientService.create(body);
+    body.userId = 1;
+    return await this.patientService.createOne(body);
+    // return await this.patientService.create(body);
   }
 
   @Patch('/:id')

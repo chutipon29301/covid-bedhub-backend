@@ -1,7 +1,7 @@
 import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Hospital } from 'src/entities/Hospital.entity';
-import { Profile } from 'src/entities/Profile.entity';
+import { Hospital } from '../entities/Hospital.entity';
+import { Profile } from '../entities/Profile.entity';
 import { Repository } from 'typeorm';
 import { Officer } from '../entities/Officer.entity';
 import { CreateOfficerDto } from './dto/create-officer.dto';
