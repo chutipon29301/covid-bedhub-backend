@@ -1,6 +1,6 @@
 import { IsString, IsNumber, IsInt } from 'class-validator';
 
-export class CreateProfileDto {
+export class CreatePatientDto {
   @IsInt()
   userId: number;
 

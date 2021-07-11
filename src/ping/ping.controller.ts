@@ -17,8 +17,8 @@ export class PingController {
     return { msg: 'pong' };
   }
 
-  @Roles('patient')
-  @Get('patient')
+  @Roles('profile')
+  @Get('profile')
   pingPatient() {
     return { msg: 'pong' };
   }

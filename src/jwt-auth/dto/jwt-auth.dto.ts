@@ -1,4 +1,4 @@
-export type AccountType = 'patient' | 'staff' | 'queue_manager' | 'code_generator';
+export type AccountType = 'profile' | 'staff' | 'queue_manager' | 'code_generator';
 
 export interface JwtPayload {
   id: number;

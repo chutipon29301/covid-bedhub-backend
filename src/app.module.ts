@@ -5,7 +5,7 @@ import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { config, Env } from './config';
 import { HealthController } from './health/health.controller';
 import { HospitalModule } from './hospital/hospital.module';
-import { ProfileModule } from './profile/profile.module';
+import { PatientModule } from './patient/patient.module';
 import { TicketModule } from './ticket/ticket.module';
 import { UserModule } from './user/user.module';
 import { LineModule } from './line/line.module';
@@ -32,7 +32,7 @@ import { PingModule } from './ping/ping.module';
       },
     }),
     HospitalModule,
-    ProfileModule,
+    PatientModule,
     TicketModule,
     UserModule,
     LineModule,

@@ -39,6 +39,6 @@ export class AuthController {
   @Post('line/token')
   async lineAdminAuthToken(@Body() body: RequestTokenDto): Promise<JwtTokenInfo> {
     const accessToken = await this.service.getAccessToken(body.code);
-    return this.service.getPatientJwtTokenFromLineToken(accessToken.idToken);
+    return this.service.getProfileJwtTokenFromLineToken(accessToken.idToken);
   }
 }

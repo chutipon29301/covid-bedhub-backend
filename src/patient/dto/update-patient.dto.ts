@@ -1,7 +1,7 @@
 import { IsString, IsNumber } from 'class-validator';
 import { ToInt } from 'class-sanitizer';
 
-export class UpdateProfileDto {
+export class UpdatePatientDto {
   @IsString()
   firstName: string;
 
