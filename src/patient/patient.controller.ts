@@ -4,14 +4,17 @@ import { AllowUnauthenticated } from '../decorators/allow-unauthenticated.decora
 import { PatientService } from './patient.service';
 import { CreatePatientDto, UpdatePatientDto } from './dto/patient.dto';
 import { Patient } from '../entities';
+import { UserToken } from '../decorators/user-token.decorator';
+import { JwtPayload } from '../jwt-auth/dto/jwt-auth.dto';
 
 @Controller('patient')
 export class PatientController {
   constructor(private readonly patientService: PatientService) {}
   @AllowUnauthenticated
   @Get()
-  async list(): Promise<Patient[]> {
-    return this.patientService.findMany();
+  async list(@UserToken() user: JwtPayload): Promise<Patient[]> {
+    const user_id = 1;
+    return this.patientService.findMany({ userId: user_id });
   }
 
   @AllowUnauthenticated

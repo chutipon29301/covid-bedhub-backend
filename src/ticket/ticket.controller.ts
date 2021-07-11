@@ -1,5 +1,7 @@
 import { AllowAnyPermission } from '../decorators/allow-any-permission.decorator';
 import { Body, Controller, Delete, Get, Patch, Post } from '@nestjs/common';
+import { UserToken } from '../decorators/user-token.decorator';
+import { JwtPayload } from '../jwt-auth/dto/jwt-auth.dto';
 import { AllowUnauthenticated } from '../decorators/allow-unauthenticated.decorator';
 import { IdParam } from '../decorators/id.decorator';
 import { Ticket } from '../entities/Ticket.entity';
@@ -10,17 +12,17 @@ import { TicketService } from './ticket.service';
 @Controller('ticket')
 export class TicketController {
   constructor(private readonly ticketService: TicketService) {}
-
+  @AllowUnauthenticated
   @Get()
-  async list(): Promise<Ticket[]> {
-    return this.ticketService.findMany();
+  async list(@UserToken() user: JwtPayload): Promise<Ticket[]> {
+    const user_id = 1;
+    return this.ticketService.listAllTicketsOfProfile(user_id);
   }
 
   @AllowUnauthenticated
   @Post()
   async add(@Body() body: CreateTicketDto): Promise<Ticket> {
     return await this.ticketService.createOne(body);
-    // return await this.ticketService.create(body);
   }
 
   @Patch('/:id')

@@ -5,14 +5,24 @@ import { In, Repository } from 'typeorm';
 import { Symptom, Ticket, TicketStatus } from '../entities/Ticket.entity';
 import { CrudService } from '../libs/crud.service';
 import { CreateTicketDto } from './dto/create-ticket.dto';
+import { Patient } from '../entities/Patient.entity';
 
 @Injectable()
 export class TicketService extends CrudService<Ticket> {
   constructor(
+    @InjectRepository(Patient) private readonly patientRepo: Repository<Patient>,
     @InjectRepository(Vaccine) private readonly vaccineRepo: Repository<Vaccine>,
     @InjectRepository(Ticket) repo: Repository<Ticket>,
   ) {
     super(repo);
+  }
+  public async listAllTicketsOfProfile(userId: number): Promise<Ticket[]> {
+    const tickets = await this.repo
+      .createQueryBuilder('ticket')
+      .innerJoinAndSelect('ticket.patient', 'patient')
+      .where('patient.userId = :userId', { userId })
+      .getMany();
+    return tickets;
   }
   public async createOne(body: CreateTicketDto): Promise<Ticket> {
     // body.
@@ -22,7 +32,6 @@ export class TicketService extends CrudService<Ticket> {
         status: In([TicketStatus.ACCEPTED, TicketStatus.MATCH, TicketStatus.REQUEST]),
       },
     });
-    console.log('existing', existingTicket);
     if (existingTicket.length > 0) {
       throw new InternalServerErrorException('Patient already create ticket');
     }
