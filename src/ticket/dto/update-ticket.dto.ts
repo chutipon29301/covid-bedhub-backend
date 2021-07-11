@@ -14,5 +14,5 @@ export class UpdateTicketDto {
   examDate: string;
 
   @IsString()
-  symptom: Symptom[];
+  symptoms: Symptom[];
 }

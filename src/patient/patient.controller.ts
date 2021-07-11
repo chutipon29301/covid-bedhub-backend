@@ -8,7 +8,7 @@ import { Patient } from '../entities';
 @Controller('patient')
 export class PatientController {
   constructor(private readonly patientService: PatientService) {}
-
+  @AllowUnauthenticated
   @Get()
   async list(): Promise<Patient[]> {
     return this.patientService.findMany();
