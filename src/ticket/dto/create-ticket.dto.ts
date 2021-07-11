@@ -1,7 +1,7 @@
 import { IsString, IsNumber, IsInt, IsArray, IsEnum } from 'class-validator';
 import { toDate } from 'date-fns';
 import { Symptom } from '../../entities';
-import { Vaccine } from '../../entities/Vaccine.entity';
+import { Vaccine, VaccineName } from '../../entities/Vaccine.entity';
 
 export class CreateTicketDto {
   @IsInt()
@@ -14,17 +14,19 @@ export class CreateTicketDto {
   examDate: string;
 
   @IsString()
-  symptom: Symptom[];
+  symptoms: Symptom[];
 
   @IsArray()
   vaccines: VaccineDto[];
 }
 
 export class VaccineDto {
+  @IsInt()
+  ticketId: number;
   @IsString()
-  receiveDate: number;
+  vaccineReceiveDate: string;
   @IsInt()
   doseNumber: number;
-  @IsEnum(Vaccine)
-  vaccineName: Vaccine;
+  @IsEnum(VaccineName)
+  vaccineName: VaccineName;
 }
