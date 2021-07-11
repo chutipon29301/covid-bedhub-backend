@@ -8,7 +8,7 @@ import { nanoid } from 'nanoid';
 import { CreateHospitalDto } from './dto/create-hospital.dto';
 import { UpdateCodeDto } from './dto/update-code.dto';
 import { log } from 'console';
-import { Officer } from 'src/entities/Officer.entity';
+import { Officer } from '../entities/Officer.entity';
 @Injectable()
 export class HospitalService extends CrudService<Hospital> {
   constructor(

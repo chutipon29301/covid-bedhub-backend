@@ -3,7 +3,7 @@ import { PatientService } from './Patient.service';
 import { CreatePatientDto } from './dto/create-patient.dto';
 import { UpdatePatientDto } from './dto/update-patient.dto';
 import { Patient } from '../entities/Patient.entity';
-import { AllowUnauthenticated } from 'src/decorators/allow-unauthenticated.decorator';
+import { AllowUnauthenticated } from '../decorators/allow-unauthenticated.decorator';
 
 @Controller('patient')
 export class PatientController {

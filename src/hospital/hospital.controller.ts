@@ -1,13 +1,13 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
-import { Hospital } from 'src/entities/Hospital.entity';
+import { Hospital } from '../entities/Hospital.entity';
 import { HospitalService } from './hospital.service';
 import { CreateHospitalDto } from './dto/create-hospital.dto';
 import { UpdateHospitalDto } from './dto/update-hospital.dto';
-import { AccessCode } from 'src/entities/AccessCode.entity';
+import { AccessCode } from '../entities/AccessCode.entity';
 import { UpdateCodeDto } from './dto/update-code.dto';
-import { UserToken } from 'src/decorators/user-token.decorator';
-import { JwtPayload } from 'src/jwt-auth/dto/jwt-auth.dto';
-import { AllowUnauthenticated } from 'src/decorators/allow-unauthenticated.decorator';
+import { UserToken } from '../decorators/user-token.decorator';
+import { JwtPayload } from '../jwt-auth/dto/jwt-auth.dto';
+import { AllowUnauthenticated } from '../decorators/allow-unauthenticated.decorator';
 @Controller('hospital')
 export class HospitalController {
   constructor(private readonly hospitalService: HospitalService) {}

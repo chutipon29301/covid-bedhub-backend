@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Profile } from 'src/entities/Profile.entity';
+import { Profile } from '../entities/Profile.entity';
 import { Repository } from 'typeorm';
 import { Patient } from '../entities/Patient.entity';
 import { CrudService } from '../libs/crud.service';

@@ -1,6 +1,6 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { AllowUnauthenticated } from 'src/decorators/allow-unauthenticated.decorator';
-import { Officer } from 'src/entities/Officer.entity';
+import { AllowUnauthenticated } from '../decorators/allow-unauthenticated.decorator';
+import { Officer } from '../entities/Officer.entity';
 import { CreateOfficerDto } from './dto/create-officer.dto';
 import { UserService } from './user.service';
 

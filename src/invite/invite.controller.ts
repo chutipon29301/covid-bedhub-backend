@@ -1,6 +1,6 @@
 import { Controller, Get, Param, ParseIntPipe } from '@nestjs/common';
-import { AllowUnauthenticated } from 'src/decorators/allow-unauthenticated.decorator';
-import { AccessCode } from 'src/entities/AccessCode.entity';
+import { AllowUnauthenticated } from '../decorators/allow-unauthenticated.decorator';
+import { AccessCode } from '../entities/AccessCode.entity';
 import { InviteService } from './invite.service';
 
 @Controller('invite')
