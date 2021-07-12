@@ -1,5 +1,5 @@
 import { IsString, IsNumber, IsInt, IsArray } from 'class-validator';
-import { Illness } from 'src/entities/Patient.entity';
+import { Illness } from '../../entities/Patient.entity';
 
 export class CreatePatientDto {
   @IsInt()
