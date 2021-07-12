@@ -1,7 +1,7 @@
 import { IsString, IsNumber, IsInt, IsArray, IsEnum } from 'class-validator';
 import { toDate } from 'date-fns';
 import { Symptom } from '../../entities';
-import { Vaccine, VaccineName } from '../../entities/Vaccine.entity';
+import { VaccineName } from '../../entities/Vaccine.entity';
 
 export class CreateTicketDto {
   @IsInt()
