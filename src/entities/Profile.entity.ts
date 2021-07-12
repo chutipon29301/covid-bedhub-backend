@@ -10,10 +10,10 @@ export class Profile extends PrimaryGeneratedEntity {
   @Column({ nullable: true })
   defaultPatientId: number;
 
-  @OneToMany(() => Patient, o => o.user)
+  @OneToMany(() => Patient, o => o.profile)
   patients?: Patient[];
 
-  @OneToOne(() => Patient, o => o.profile, { nullable: true })
+  @OneToOne(() => Patient, o => o.defaultProfile, { nullable: true })
   @JoinColumn({ name: 'defaultPatientId', referencedColumnName: 'id' })
   defaultPatient: Patient;
 }

@@ -1,6 +1,6 @@
 import { Connection } from 'typeorm';
 import { Factory, Seeder } from 'typeorm-seeding';
-import { AccessCode, Hospital, Officer, OfficerRole, UserType } from './src/entities';
+import { AccessCode, Hospital, Officer, OfficerRole, Patient, Profile, Ticket, UserType } from './src/entities';
 
 export default class E2EApplicationSeeder implements Seeder {
   async run(factory: Factory, connection: Connection) {
@@ -18,6 +18,27 @@ export default class E2EApplicationSeeder implements Seeder {
         ...(await factory(Officer)().createMany(5, { role: OfficerRole.QUEUE_MANAGER, hospitalId })),
       );
       staffOfficer.push(...(await factory(Officer)().createMany(20, { role: OfficerRole.STAFF, hospitalId })));
+    }
+
+    const profiles = await factory(Profile)().createMany(50);
+    const patients: Patient[] = [];
+    for (const profile of profiles) {
+      const generatePatient = await factory(Patient)().createMany(2, { profileId: profile.id });
+      patients.push(...generatePatient);
+      const profileRepo = connection.getRepository(Profile);
+      await profileRepo.update(
+        {
+          id: profile.id,
+        },
+        {
+          defaultPatientId: patients[0].id,
+        },
+      );
+    }
+
+    const tickets: Ticket[] = [];
+    for (const patient of patients) {
+      tickets.push(await factory(Ticket)().create({ patientId: patient.id }));
     }
   }
 }

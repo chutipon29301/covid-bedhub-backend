@@ -24,16 +24,13 @@ export class HospitalService extends CrudService<Hospital> {
     queueAccessCode.accessCode = nanoid(6);
     staffAccessCode.userType = UserType.STAFF;
     queueAccessCode.userType = UserType.QUEUE_MANAGER;
-    const hospital: Hospital = await this.repo
-      .createQueryBuilder()
-      .insert()
-      .into(Hospital)
-      .values({
-        ...body,
-        location: () => `point(${body.lat}, ${body.lng})`,
-      })
-      .execute()
-      .then(o => o.raw[0]);
+    const hospital = await this.create({
+      ...body,
+      location: {
+        type: 'Point',
+        coordinates: [body.lat, body.lng],
+      },
+    });
     staffAccessCode.hospitalId = hospital.id;
     queueAccessCode.hospitalId = hospital.id;
     await this.accessCodeRepo.save([staffAccessCode, queueAccessCode]);

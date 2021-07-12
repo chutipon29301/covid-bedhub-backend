@@ -3,6 +3,7 @@ import { AccessCode } from './AccessCode.entity';
 import { Officer } from './Officer.entity';
 import { PrimaryGeneratedEntity } from './PrimaryGenerated.abstract';
 import { Ticket } from './Ticket.entity';
+import { Point } from 'geojson';
 
 @Entity()
 export class Hospital extends PrimaryGeneratedEntity {
@@ -24,14 +25,12 @@ export class Hospital extends PrimaryGeneratedEntity {
   @Column()
   tel: string;
 
-  // @Column('point')
-  // location: any;
-
-  // @Column('numeric')
-  // lat: number;
-
-  // @Column('numeric')
-  // lng: number;
+  @Column({
+    type: 'geography',
+    spatialFeatureType: 'Point',
+    srid: 4326,
+  })
+  location: Point;
 
   @OneToMany(() => AccessCode, o => o.hospital)
   accessCodes?: AccessCode[];
