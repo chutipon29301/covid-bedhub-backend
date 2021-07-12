@@ -8,7 +8,7 @@ export class Reporter extends PrimaryGeneratedEntity {
   lineId: string;
 
   @Column({ nullable: true })
-  defaultPatientId: number;
+  defaultPatientId?: number;
 
   @OneToMany(() => Patient, o => o.reporter)
   patients?: Patient[];

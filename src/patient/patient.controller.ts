@@ -25,7 +25,7 @@ export class PatientController {
   @Roles('reporter', 'queue_manager')
   @Post()
   async add(@UserToken() user: JwtPayload, @Body() body: CreatePatientDto): Promise<Patient> {
-    body.userId = user.id;
+    body.reporterId = user.id;
     return await this.patientService.create(body);
   }
 

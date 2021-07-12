@@ -3,7 +3,7 @@ import { Illness } from '../../entities/Patient.entity';
 
 export class CreatePatientDto {
   @IsInt()
-  userId: number;
+  reporterId: number;
 
   @IsString()
   firstName: string;

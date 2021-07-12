@@ -9,16 +9,16 @@ import { Patient, Reporter } from '../entities';
 export class PatientService extends CrudService<Patient> {
   constructor(
     @InjectRepository(Patient) repo: Repository<Patient>,
-    @InjectRepository(Reporter) private readonly profileRepo: Repository<Reporter>,
+    @InjectRepository(Reporter) private readonly reporterRepo: Repository<Reporter>,
   ) {
     super(repo);
   }
   public async createOne(body: CreatePatientDto): Promise<Patient> {
     // body.
     const patient = await this.create(body);
-    const profile = await this.profileRepo.findOne({ id: body.userId });
-    profile.defaultPatientId = patient.id;
-    await this.profileRepo.update({ id: body.userId }, profile);
+    const reporter = await this.reporterRepo.findOne({ id: body.reporterId });
+    reporter.defaultPatientId = patient.id;
+    await this.reporterRepo.update({ id: body.reporterId }, reporter);
     return patient;
   }
 }
