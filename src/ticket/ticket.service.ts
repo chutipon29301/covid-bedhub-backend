@@ -1,16 +1,16 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Vaccine } from '../entities/Vaccine.entity';
 import { In, Repository } from 'typeorm';
 import { Symptom, Ticket, TicketStatus } from '../entities/Ticket.entity';
 import { CrudService } from '../libs/crud.service';
 import { CreateTicketDto } from './dto/create-ticket.dto';
-import { Patient } from '../entities/Patient.entity';
+import { Officer } from '../entities/Officer.entity';
 
 @Injectable()
 export class TicketService extends CrudService<Ticket> {
   constructor(
-    @InjectRepository(Patient) private readonly patientRepo: Repository<Patient>,
+    @InjectRepository(Officer) private readonly officerRepo: Repository<Officer>,
     @InjectRepository(Vaccine) private readonly vaccineRepo: Repository<Vaccine>,
     @InjectRepository(Ticket) repo: Repository<Ticket>,
   ) {
@@ -23,6 +23,13 @@ export class TicketService extends CrudService<Ticket> {
       .where('patient.userId = :userId', { userId })
       .getMany();
     return tickets;
+  }
+  public async listAllHospitalTickets(userId: number, ticketStatus: TicketStatus): Promise<Ticket[]> {
+    const officer = await this.officerRepo.findOne({ id: userId });
+    if (officer && ticketStatus) {
+      return await this.repo.find({ where: { hospitalId: officer.hospitalId, status: ticketStatus } });
+    }
+    return await this.repo.find({ where: { hospitalId: officer.hospitalId, relation: ['patient'] } });
   }
   public async createOne(body: CreateTicketDto): Promise<Ticket> {
     // body.

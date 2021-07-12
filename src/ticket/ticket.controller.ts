@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, InternalServerErrorException, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, InternalServerErrorException, Patch, Post, Query } from '@nestjs/common';
 import { UserToken } from '../decorators/user-token.decorator';
 import { JwtPayload } from '../jwt-auth/dto/jwt-auth.dto';
 import { AllowUnauthenticated } from '../decorators/allow-unauthenticated.decorator';
@@ -8,15 +8,23 @@ import { CreateTicketDto } from './dto/create-ticket.dto';
 import { UpdateTicketDto } from './dto/update-ticket.dto';
 import { TicketService } from './ticket.service';
 import { differenceInDays, parseISO } from 'date-fns';
+import { QueryTicketDto } from './dto/list-ticket.dto';
 
 @Controller('ticket')
 export class TicketController {
   constructor(private readonly ticketService: TicketService) {}
+
   @AllowUnauthenticated
   @Get()
   async list(@UserToken() user: JwtPayload): Promise<Ticket[]> {
     const user_id = 1;
     return this.ticketService.listAllTicketsOfProfile(user_id);
+  }
+  @AllowUnauthenticated
+  @Get('/accept')
+  async listHospitalTicket(@UserToken() user: JwtPayload, @Query() query: QueryTicketDto): Promise<Ticket[]> {
+    const user_id = 1;
+    return this.ticketService.listAllHospitalTickets(user_id, query.ticketStatus);
   }
 
   @AllowUnauthenticated
