@@ -31,7 +31,7 @@ export default class E2EApplicationSeeder implements Seeder {
           id: profile.id,
         },
         {
-          defaultPatientId: patients[0].id,
+          defaultPatientId: generatePatient[0].id,
         },
       );
     }
