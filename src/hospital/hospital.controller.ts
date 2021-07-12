@@ -16,6 +16,7 @@ export class HospitalController {
     return this.hospitalService.findMany();
   }
 
+  @AllowUnauthenticated
   @Post()
   async add(@Body() body: CreateHospitalDto): Promise<Hospital> {
     return await this.hospitalService.createOne(body);

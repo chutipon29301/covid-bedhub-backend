@@ -1,3 +1,4 @@
+import { AllowAnyPermission } from '../decorators/allow-any-permission.decorator';
 import { Body, Controller, Delete, Get, Patch, Post } from '@nestjs/common';
 import { AllowUnauthenticated } from '../decorators/allow-unauthenticated.decorator';
 import { IdParam } from '../decorators/id.decorator';

@@ -1,3 +1,4 @@
+import { Point } from 'geojson';
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { Hospital } from './Hospital.entity';
 import { Officer } from './Officer.entity';
@@ -70,6 +71,13 @@ export class Ticket extends PrimaryGeneratedEntity {
 
   @Column('int')
   riskLevel: number;
+
+  @Column({
+    type: 'geography',
+    spatialFeatureType: 'Point',
+    srid: 4326,
+  })
+  location: Point;
 
   @Column({
     nullable: true,
