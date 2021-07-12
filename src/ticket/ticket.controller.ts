@@ -15,13 +15,13 @@ import { Roles } from 'src/decorators/roles.decorator';
 export class TicketController {
   constructor(private readonly ticketService: TicketService) {}
 
-  @Roles('reporter', 'queue_manager')
+  @Roles('reporter')
   @Get()
   async list(@UserToken() user: JwtPayload): Promise<Ticket[]> {
     return this.ticketService.listAllTicketsOfReporter(user.id);
   }
-  @Roles('reporter', 'queue_manager')
-  @Get('/accept')
+  @Roles('queue_manager')
+  @Get('/hospital')
   async listHospitalTicket(@UserToken() user: JwtPayload, @Query() query: QueryTicketDto): Promise<Ticket[]> {
     return this.ticketService.listAllHospitalTickets(user.id, query.ticketStatus);
   }
