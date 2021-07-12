@@ -57,6 +57,11 @@ export class Ticket extends PrimaryGeneratedEntity {
   })
   appointedDate?: string;
 
+  @Column({
+    nullable: true,
+  })
+  notes?: string;
+
   @Column('int')
   riskLevel: number;
 
