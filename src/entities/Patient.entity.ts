@@ -54,7 +54,7 @@ export class Patient extends PrimaryGeneratedEntity {
     array: true,
     nullable: true,
   })
-  illnesses: string[];
+  illnesses?: Illness[];
 
   @ManyToOne(() => Profile, o => o.patients)
   @JoinColumn({ name: 'profileId', referencedColumnName: 'id' })
