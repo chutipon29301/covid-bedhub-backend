@@ -1,6 +1,6 @@
 import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Hospital, Profile, Officer } from '../entities';
+import { Hospital, Reporter, Officer } from '../entities';
 import { Repository } from 'typeorm';
 import { CreateOfficerDto } from './dto/user.dto';
 
@@ -9,17 +9,17 @@ export class UserService {
   constructor(
     @InjectRepository(Hospital) private readonly hospitalRepo: Repository<Hospital>,
     @InjectRepository(Officer) private readonly officerRepo: Repository<Officer>,
-    @InjectRepository(Profile) private readonly profileRepo: Repository<Profile>,
+    @InjectRepository(Reporter) private readonly reporterRepo: Repository<Reporter>,
   ) {}
 
-  async ensureProfile(lineId: string): Promise<Profile> {
-    const profile = await this.profileRepo.findOne({ where: { lineId }, relations: ['defaultPatient'] });
+  async ensureProfile(lineId: string): Promise<Reporter> {
+    const profile = await this.reporterRepo.findOne({ where: { lineId }, relations: ['defaultPatient'] });
     if (profile) {
       return profile;
     }
-    const newProfile = new Profile();
+    const newProfile = new Reporter();
     newProfile.lineId = lineId;
-    return this.profileRepo.create(newProfile);
+    return this.reporterRepo.create(newProfile);
   }
 
   async createOfficer(user: CreateOfficerDto): Promise<Officer> {

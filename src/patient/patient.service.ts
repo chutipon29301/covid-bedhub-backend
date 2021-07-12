@@ -4,12 +4,12 @@ import { Repository } from 'typeorm';
 
 import { CrudService } from '../libs/crud.service';
 import { CreatePatientDto } from './dto/patient.dto';
-import { Patient, Profile } from '../entities';
+import { Patient, Reporter } from '../entities';
 @Injectable()
 export class PatientService extends CrudService<Patient> {
   constructor(
     @InjectRepository(Patient) repo: Repository<Patient>,
-    @InjectRepository(Profile) private readonly profileRepo: Repository<Profile>,
+    @InjectRepository(Reporter) private readonly profileRepo: Repository<Reporter>,
   ) {
     super(repo);
   }

@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Patch, Post, UnauthorizedException } from '@nestjs/common';
 import { IdParam } from '../decorators/id.decorator';
 import { AllowUnauthenticated } from '../decorators/allow-unauthenticated.decorator';
 import { PatientService } from './patient.service';
@@ -6,20 +6,26 @@ import { CreatePatientDto, UpdatePatientDto } from './dto/patient.dto';
 import { Patient } from '../entities';
 import { UserToken } from '../decorators/user-token.decorator';
 import { JwtPayload } from '../jwt-auth/dto/jwt-auth.dto';
+import { Roles } from 'src/decorators/roles.decorator';
 
 @Controller('patient')
 export class PatientController {
   constructor(private readonly patientService: PatientService) {}
-  @AllowUnauthenticated
+
+  @Roles('reporter', 'queue_manager')
   @Get()
   async list(@UserToken() user: JwtPayload): Promise<Patient[]> {
-    return this.patientService.findMany({ profileId: user.id });
+    console.log(user);
+    if (user) {
+      return this.patientService.findMany({ reporterId: user.id });
+    }
+    throw new UnauthorizedException('User not allowed');
   }
 
-  @AllowUnauthenticated
+  @Roles('reporter', 'queue_manager')
   @Post()
-  async add(@Body() body: CreatePatientDto): Promise<Patient> {
-    body.userId = 1;
+  async add(@UserToken() user: JwtPayload, @Body() body: CreatePatientDto): Promise<Patient> {
+    body.userId = user.id;
     return await this.patientService.create(body);
   }
 

@@ -37,7 +37,7 @@ export class AuthService {
       const profile = await this.userService.ensureProfile(decodedLineToken.sub);
       return this.jwtAuthService.sign({
         id: profile.id,
-        accountType: 'profile',
+        accountType: 'reporter',
         hasProfile: !!profile.patients,
       });
     } else {

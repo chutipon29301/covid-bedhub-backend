@@ -9,25 +9,24 @@ import { UpdateTicketDto } from './dto/update-ticket.dto';
 import { TicketService } from './ticket.service';
 import { differenceInDays, parseISO } from 'date-fns';
 import { QueryTicketDto } from './dto/list-ticket.dto';
+import { Roles } from 'src/decorators/roles.decorator';
 
 @Controller('ticket')
 export class TicketController {
   constructor(private readonly ticketService: TicketService) {}
 
-  @AllowUnauthenticated
+  @Roles('reporter', 'queue_manager')
   @Get()
   async list(@UserToken() user: JwtPayload): Promise<Ticket[]> {
-    const user_id = 1;
-    return this.ticketService.listAllTicketsOfProfile(user_id);
+    return this.ticketService.listAllTicketsOfReporter(user.id);
   }
-  @AllowUnauthenticated
+  @Roles('reporter', 'queue_manager')
   @Get('/accept')
   async listHospitalTicket(@UserToken() user: JwtPayload, @Query() query: QueryTicketDto): Promise<Ticket[]> {
-    const user_id = 1;
-    return this.ticketService.listAllHospitalTickets(user_id, query.ticketStatus);
+    return this.ticketService.listAllHospitalTickets(user.id, query.ticketStatus);
   }
 
-  @AllowUnauthenticated
+  @Roles('reporter', 'queue_manager')
   @Post()
   async add(@Body() body: CreateTicketDto): Promise<Ticket> {
     return await this.ticketService.createOne(body);
@@ -38,7 +37,7 @@ export class TicketController {
     return this.ticketService.updateOne({ id }, Ticket);
   }
 
-  @AllowUnauthenticated
+  @Roles('reporter', 'queue_manager')
   @Patch('/cancel/:id')
   async cancel(@IdParam() id: number) {
     const currentTicket = await this.ticketService.findOne({ id });

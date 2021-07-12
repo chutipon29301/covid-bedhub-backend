@@ -1,7 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 import { PrimaryGeneratedEntity } from './PrimaryGenerated.abstract';
 import { Ticket } from './Ticket.entity';
-import { Profile } from './Profile.entity';
+import { Reporter } from './Reporter.entity';
 
 export enum Illness {
   NCDs = 'NCDs', // โรคทางเดินหายใจเรื้อรัง
@@ -16,7 +16,7 @@ export enum Illness {
 @Entity()
 export class Patient extends PrimaryGeneratedEntity {
   @Column('int')
-  profileId: number;
+  reporterId: number;
 
   @Column()
   firstName: string;
@@ -56,13 +56,13 @@ export class Patient extends PrimaryGeneratedEntity {
   })
   illnesses?: Illness[];
 
-  @ManyToOne(() => Profile, o => o.patients)
-  @JoinColumn({ name: 'profileId', referencedColumnName: 'id' })
-  profile?: Profile;
+  @ManyToOne(() => Reporter, o => o.patients)
+  @JoinColumn({ name: 'reporterId', referencedColumnName: 'id' })
+  reporter?: Reporter;
 
   @OneToMany(() => Ticket, o => o.patient)
   tickets?: Ticket[];
 
-  @OneToOne(() => Profile, o => o.defaultPatient, { nullable: true })
-  defaultProfile?: Profile;
+  @OneToOne(() => Reporter, o => o.defaultPatient, { nullable: true })
+  defaultReporter?: Reporter;
 }

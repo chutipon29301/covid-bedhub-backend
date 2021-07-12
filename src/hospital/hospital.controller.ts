@@ -2,11 +2,11 @@ import { Body, Controller, Delete, Get, Patch, Post } from '@nestjs/common';
 
 import { UserToken } from '../decorators/user-token.decorator';
 import { JwtPayload } from '../jwt-auth/dto/jwt-auth.dto';
-import { AllowUnauthenticated } from '../decorators/allow-unauthenticated.decorator';
 import { HospitalService } from './hospital.service';
 import { CreateHospitalDto, UpdateCodeDto, UpdateHospitalDto } from './dto/hospital.dto';
 import { Hospital } from '../entities';
 import { IdParam } from '../decorators/id.decorator';
+import { Roles } from 'src/decorators/roles.decorator';
 
 @Controller('hospital')
 export class HospitalController {
@@ -15,21 +15,19 @@ export class HospitalController {
   async list(): Promise<Hospital[]> {
     return this.hospitalService.findMany();
   }
-  @AllowUnauthenticated
+  @Roles('code_generator')
   @Post()
   async add(@Body() body: CreateHospitalDto): Promise<Hospital> {
     return await this.hospitalService.createOne(body);
-    // return await this.hospitalService.create(body);
   }
 
-  @AllowUnauthenticated
+  @Roles('code_generator')
   @Post('/set-code')
   async setCode(@UserToken() user: JwtPayload, @Body() body: UpdateCodeDto): Promise<Hospital> {
-    const user_id = 1;
-    // return await this.hospitalService.updateCode(user.id, body.userType, body.newCode);
-    return await this.hospitalService.updateCode(user_id, body.userType, body.newCode);
+    return await this.hospitalService.updateCode(user.id, body.userType, body.newCode);
   }
 
+  @Roles('code_generator')
   @Patch('/:id')
   async edit(@IdParam() id: number, @Body() hospital: UpdateHospitalDto) {
     return this.hospitalService.updateOne({ id }, hospital);

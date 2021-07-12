@@ -3,17 +3,17 @@ import { PrimaryGeneratedEntity } from './PrimaryGenerated.abstract';
 import { Patient } from './Patient.entity';
 
 @Entity()
-export class Profile extends PrimaryGeneratedEntity {
+export class Reporter extends PrimaryGeneratedEntity {
   @Column()
   lineId: string;
 
   @Column({ nullable: true })
   defaultPatientId: number;
 
-  @OneToMany(() => Patient, o => o.profile)
+  @OneToMany(() => Patient, o => o.reporter)
   patients?: Patient[];
 
-  @OneToOne(() => Patient, o => o.defaultProfile, { nullable: true })
+  @OneToOne(() => Patient, o => o.defaultReporter, { nullable: true })
   @JoinColumn({ name: 'defaultPatientId', referencedColumnName: 'id' })
   defaultPatient: Patient;
 }

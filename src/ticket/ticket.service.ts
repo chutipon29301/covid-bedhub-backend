@@ -18,11 +18,11 @@ export class TicketService extends CrudService<Ticket> {
   ) {
     super(repo);
   }
-  public async listAllTicketsOfProfile(userId: number): Promise<Ticket[]> {
+  public async listAllTicketsOfReporter(reporterId: number): Promise<Ticket[]> {
     const tickets = await this.repo
       .createQueryBuilder('ticket')
       .innerJoinAndSelect('ticket.patient', 'patient')
-      .where('patient.userId = :userId', { userId })
+      .where('patient.reporterId = :reporterId', { reporterId })
       .getMany();
     return tickets;
   }
