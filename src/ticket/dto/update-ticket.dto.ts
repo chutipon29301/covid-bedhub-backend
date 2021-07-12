@@ -1,9 +1,9 @@
-import { IsString, IsNumber, IsInt, IsArray, IsEnum } from 'class-validator';
+import { IsString, IsNumber, IsInt, IsArray, IsEnum, IsIn } from 'class-validator';
 import { toDate } from 'date-fns';
-import { Symptom } from '../../entities';
+import { Symptom, TicketStatus } from '../../entities';
 import { Vaccine } from '../../entities/Vaccine.entity';
 
-export class UpdateTicketDto {
+export class UpdatePatientTicketDto {
   @IsInt()
   patientId: number;
 
@@ -15,4 +15,21 @@ export class UpdateTicketDto {
 
   @IsString()
   symptoms: Symptom[];
+}
+
+export class UpdateHospitalTicketDto {
+  @IsInt()
+  patientId: number;
+
+  @IsIn([TicketStatus.HOSPITAL_CANCEL, TicketStatus.ACCEPTED])
+  status: TicketStatus;
+
+  @IsString()
+  appointedDate: string;
+
+  @IsString()
+  notes: string;
+
+  @IsInt()
+  riskLevel: number;
 }
