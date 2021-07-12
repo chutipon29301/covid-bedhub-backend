@@ -1,8 +1,9 @@
 import { HttpService, Injectable, UnauthorizedException } from '@nestjs/common';
-import { LineAccessToken, LineAccessTokenRequestResponse, LineToken, State } from './dto/line.dto';
+import { JwtService } from '@nestjs/jwt';
 import { AES, enc } from 'crypto-js';
 import { stringify } from 'qs';
-import { JwtService } from '@nestjs/jwt';
+
+import { LineAccessToken, LineAccessTokenRequestResponse, LineToken, State } from './dto/line.dto';
 import { ConfigService } from '../types';
 
 @Injectable()
