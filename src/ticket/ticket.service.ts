@@ -6,10 +6,12 @@ import { Symptom, Ticket, TicketStatus } from '../entities/Ticket.entity';
 import { CrudService } from '../libs/crud.service';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 import { Officer } from '../entities/Officer.entity';
+import { Patient } from '../entities/Patient.entity';
 
 @Injectable()
 export class TicketService extends CrudService<Ticket> {
   constructor(
+    @InjectRepository(Patient) private readonly patientRepo: Repository<Patient>,
     @InjectRepository(Officer) private readonly officerRepo: Repository<Officer>,
     @InjectRepository(Vaccine) private readonly vaccineRepo: Repository<Vaccine>,
     @InjectRepository(Ticket) repo: Repository<Ticket>,
@@ -57,6 +59,10 @@ export class TicketService extends CrudService<Ticket> {
         ticket.riskLevel = risks.length - index;
         break;
       }
+    }
+    const patient = await this.patientRepo.findOne({ where: { id: body.patientId } });
+    if (patient.illnesses && patient.illnesses.length > 0 && ticket.riskLevel < risks.length) {
+      ticket.riskLevel += 1;
     }
     const newTicket = await this.create(ticket);
     body.vaccines.forEach(async vaccine => {
