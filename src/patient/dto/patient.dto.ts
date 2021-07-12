@@ -1,4 +1,5 @@
-import { IsString, IsNumber, IsInt } from 'class-validator';
+import { IsString, IsNumber, IsInt, IsArray } from 'class-validator';
+import { Illness } from 'src/entities/Patient.entity';
 
 export class CreatePatientDto {
   @IsInt()
@@ -36,6 +37,9 @@ export class CreatePatientDto {
 
   @IsString()
   tel: string;
+
+  @IsArray()
+  illnesses: Illness[];
 
   @IsNumber()
   lat: number;
