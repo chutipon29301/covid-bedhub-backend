@@ -49,26 +49,32 @@ export class TicketService extends CrudService<Ticket> {
     ticket.examReceiveDate = body.examReceiveDate;
     ticket.examDate = body.examDate;
     ticket.symptoms = body.symptoms;
-    const risk1 = [Symptom.FEVER, Symptom.COUGH, Symptom.SMELLESS_RASH];
-    const risk2 = [Symptom.DIARRHEA, Symptom.TIRED_HEADACHE, Symptom.DIFFICULT_BREATHING, Symptom.ANGINA];
-    const risk3 = [Symptom.EXHAUSTED, Symptom.CHEST_PAIN, Symptom.UNCONCIOUS];
-    const risks = [risk3, risk2, risk1];
-    for (const [index, riskFactors] of risks.entries()) {
-      const found = body.symptoms.filter(value => riskFactors.includes(value));
-      if (found.length > 0) {
-        ticket.riskLevel = risks.length - index;
-        break;
-      }
-    }
-    const patient = await this.patientRepo.findOne({ where: { id: body.patientId } });
-    if (patient.illnesses && patient.illnesses.length > 0 && ticket.riskLevel < risks.length) {
-      ticket.riskLevel += 1;
-    }
+    ticket.riskLevel = await this.calculateRiskLevel(body.patientId, body.symptoms);
     const newTicket = await this.create(ticket);
     body.vaccines.forEach(async vaccine => {
       vaccine.ticketId = newTicket.id;
     });
     await this.vaccineRepo.save(body.vaccines);
     return newTicket;
+  }
+
+  public async calculateRiskLevel(patientId: number, symptoms: Symptom[]): Promise<number> {
+    let riskLevel = 0;
+    const risk1 = [Symptom.FEVER, Symptom.COUGH, Symptom.SMELLESS_RASH];
+    const risk2 = [Symptom.DIARRHEA, Symptom.TIRED_HEADACHE, Symptom.DIFFICULT_BREATHING, Symptom.ANGINA];
+    const risk3 = [Symptom.EXHAUSTED, Symptom.CHEST_PAIN, Symptom.UNCONCIOUS];
+    const risks = [risk3, risk2, risk1];
+    for (const [index, riskFactors] of risks.entries()) {
+      const found = symptoms.filter(value => riskFactors.includes(value));
+      if (found.length > 0) {
+        riskLevel = risks.length - index;
+        break;
+      }
+    }
+    const patient = await this.patientRepo.findOne({ where: { id: patientId } });
+    if (patient.illnesses && patient.illnesses.length > 0 && riskLevel < risks.length) {
+      riskLevel += 1;
+    }
+    return riskLevel;
   }
 }
