@@ -13,8 +13,7 @@ export class PatientController {
   @AllowUnauthenticated
   @Get()
   async list(@UserToken() user: JwtPayload): Promise<Patient[]> {
-    const user_id = 1;
-    return this.patientService.findMany({ userId: user_id });
+    return this.patientService.findMany({ profileId: user.id });
   }
 
   @AllowUnauthenticated
