@@ -3,6 +3,16 @@ import { PrimaryGeneratedEntity } from './PrimaryGenerated.abstract';
 import { Ticket } from './Ticket.entity';
 import { Profile } from './Profile.entity';
 
+export enum Illness {
+  NCDs = 'NCDs', // โรคทางเดินหายใจเรื้อรัง
+  CARDIOVASCULAR = 'CARDIOVASCULAR', // โรคหัวใจและหลอดเลือด
+  CKD = 'CKD', // โรคไตวายเรื้อรัง
+  STROKE = 'STROKE', //โรคหลอดเลือดสมอง
+  OBESITY = 'OBESITY', //โรคอ้วน
+  CANCER = 'CANCER', //โรคมะเร็ง
+  DIABETES = 'DIABETES', //โรคเบาหวาน
+}
+
 @Entity()
 export class Patient extends PrimaryGeneratedEntity {
   @Column('int')
@@ -37,6 +47,14 @@ export class Patient extends PrimaryGeneratedEntity {
 
   @Column()
   sex: string;
+
+  @Column({
+    type: 'enum',
+    enum: Illness,
+    array: true,
+    nullable: true,
+  })
+  illnesses: string[];
 
   @Column('numeric')
   lat: number;
