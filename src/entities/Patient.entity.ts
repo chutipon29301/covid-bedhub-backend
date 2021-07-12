@@ -16,7 +16,7 @@ export enum Illness {
 @Entity()
 export class Patient extends PrimaryGeneratedEntity {
   @Column('int')
-  userId: number;
+  profileId: number;
 
   @Column()
   firstName: string;
@@ -27,7 +27,7 @@ export class Patient extends PrimaryGeneratedEntity {
   @Column('date')
   birthDate: string;
 
-  @Column()
+  @Column({ unique: true })
   identification: string;
 
   @Column()
@@ -56,19 +56,13 @@ export class Patient extends PrimaryGeneratedEntity {
   })
   illnesses: string[];
 
-  @Column('numeric')
-  lat: number;
-
-  @Column('numeric')
-  lng: number;
-
   @ManyToOne(() => Profile, o => o.patients)
-  @JoinColumn({ name: 'userId', referencedColumnName: 'id' })
-  user?: Profile;
+  @JoinColumn({ name: 'profileId', referencedColumnName: 'id' })
+  profile?: Profile;
 
   @OneToMany(() => Ticket, o => o.patient)
   tickets?: Ticket[];
 
   @OneToOne(() => Profile, o => o.defaultPatient, { nullable: true })
-  profile?: Profile;
+  defaultProfile?: Profile;
 }

@@ -24,6 +24,7 @@ export const config = (): Env => {
       database: process.env.DATABASE_NAME,
       entities: [join(__dirname, './**/*.entity{.ts,.js}')],
       synchronize: true,
+      logging: true,
       extra: {
         charset: 'utf8_unicode_ci',
       },
