@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -15,7 +15,7 @@ export class InviteService {
     if (validCode) {
       return validCode;
     }
-    throw new Error('Access code not valid');
+    throw new NotFoundException('Access code not found');
   }
   async findMany(userId: number): Promise<AccessCode[]> {
     const officer = await this.officerRepo.findOne({ where: { id: userId } });

@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, NotFoundException, Param } from '@nestjs/common';
 
 import { AllowUnauthenticated } from '../decorators/allow-unauthenticated.decorator';
 import { InviteService } from './invite.service';
@@ -17,7 +17,7 @@ export class InviteController {
   }
   @AllowUnauthenticated
   @Get('/:code')
-  async getValidAccessCode(@Param('code') accessCode: string): Promise<AccessCode> {
-    return this.inviteService.checkAccessCodeValid(accessCode);
+  async getValidAccessCode(@Param('code') code: string): Promise<AccessCode> {
+    return this.inviteService.checkAccessCodeValid(code);
   }
 }

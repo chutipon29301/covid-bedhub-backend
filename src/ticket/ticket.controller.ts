@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   InternalServerErrorException,
+  NotFoundException,
   Patch,
   Post,
   Query,
@@ -33,9 +34,12 @@ export class TicketController {
 
   @Roles('reporter')
   @Get('/:id')
-  async list(@UserToken() user: JwtPayload, @IdParam() id: number): Promise<Ticket[]> {
-    // return this.ticketService.listAllTicketsOfReporter(user.id);
-    return;
+  async show(@UserToken() user: JwtPayload, @IdParam() id: number): Promise<Ticket> {
+    const ticket = await this.ticketService.findOne({ id });
+    if (ticket && this.ticketService.checkTicketBelongToRequester(user.id, ticket.patientId)) {
+      return ticket;
+    }
+    throw new NotFoundException('No ticket found for this reporter');
   }
 
   @Roles('queue_manager')
@@ -49,6 +53,7 @@ export class TicketController {
   async add(@Body() body: CreateTicketDto): Promise<Ticket> {
     return await this.ticketService.createOne(body);
   }
+
   @Roles('reporter')
   @Patch('/:id')
   async edit(@UserToken() user: JwtPayload, @IdParam() id: number, @Body() ticket: UpdatePatientTicketDto) {
