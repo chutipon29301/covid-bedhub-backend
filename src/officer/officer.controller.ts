@@ -2,7 +2,7 @@ import { Body, Controller, Get, Param, Patch, UnauthorizedException } from '@nes
 
 import { OfficerService } from './officer.service';
 import { Officer } from '../entities';
-import { IdParam } from '../decorators/id.decorator';
+import { IdParam } from '../decorators/express.decorator';
 import { UpdateOfficerDto } from './dto/officer.dto';
 import { Roles } from '../decorators/roles.decorator';
 import { UserToken } from '../decorators/user-token.decorator';

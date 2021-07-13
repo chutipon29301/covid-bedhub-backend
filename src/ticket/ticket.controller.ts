@@ -12,7 +12,7 @@ import {
 import { UserToken } from '../decorators/user-token.decorator';
 import { JwtPayload } from '../jwt-auth/dto/jwt-auth.dto';
 import { AllowUnauthenticated } from '../decorators/allow-unauthenticated.decorator';
-import { IdParam } from '../decorators/id.decorator';
+import { IdParam } from '../decorators/express.decorator';
 import { Ticket, TicketStatus } from '../entities/Ticket.entity';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 import { UpdateHospitalTicketDto, UpdatePatientTicketDto } from './dto/update-ticket.dto';

@@ -17,6 +17,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { PermissionsGuard } from './guard/permission.guard';
 import { PingModule } from './ping/ping.module';
 import { OfficerModule } from './officer/officer.module';
+import { GraphQLModule } from '@nestjs/graphql';
 
 @Module({
   imports: [
@@ -31,6 +32,16 @@ import { OfficerModule } from './officer/officer.module';
       useFactory: (config: ConfigService<Env>): TypeOrmModuleOptions => {
         return config.get('databaseConfig');
       },
+    }),
+    GraphQLModule.forRootAsync({
+      imports: [ConfigModule.forRoot()],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        autoSchemaFile: true,
+        playground: configService.get<string>('NODE_ENV') !== 'production',
+        context: ({ req }) => ({ req }),
+        fieldResolverEnhancers: ['guards'],
+      }),
     }),
     HospitalModule,
     PatientModule,

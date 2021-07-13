@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, NotFoundException, Patch, Post, UnauthorizedException } from '@nestjs/common';
-import { IdParam } from '../decorators/id.decorator';
+import { IdParam } from '../decorators/express.decorator';
 import { AllowUnauthenticated } from '../decorators/allow-unauthenticated.decorator';
 import { PatientService } from './patient.service';
 import { CreatePatientDto, UpdatePatientDto } from './dto/patient.dto';

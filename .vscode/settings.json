@@ -2,8 +2,10 @@
   "cSpell.words": [
     "COVID",
     "Parens",
+    "bedhub",
     "nestjs",
     "openid",
+    "prebuild",
     "timestamptz",
     "typeorm"
   ]
