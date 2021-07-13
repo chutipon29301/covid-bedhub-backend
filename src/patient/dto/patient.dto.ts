@@ -1,87 +1,12 @@
-import { IsString, IsNumber, IsInt, IsArray } from 'class-validator';
-import { Illness } from '@entity';
+import { Patient } from '@entity';
+import { InputType, PartialType } from '@nestjs/graphql';
+import { OmitPrimaryGeneratedMetadata } from 'src/entities/PrimaryGenerated.abstract';
 
-export class CreatePatientDto {
-  @IsInt()
-  reporterId: number;
+@InputType()
+export class CreatePatientDto extends PartialType(OmitPrimaryGeneratedMetadata(Patient), InputType) {}
 
-  @IsString()
-  firstName: string;
-
-  @IsString()
-  lastName: string;
-
-  @IsString()
-  birthDate: string;
-
-  @IsString()
-  identification: string;
-
-  @IsString()
-  subDistrict: string;
-
-  @IsString()
-  district: string;
-
-  @IsString()
-  province: string;
-
-  @IsString()
-  zipCode: string;
-
-  @IsString()
-  phone: string;
-
-  @IsString()
-  sex: string;
-
-  @IsString()
-  tel: string;
-
-  @IsArray()
-  illnesses: Illness[];
-
-  @IsNumber()
-  lat: number;
-
-  @IsNumber()
-  lng: number;
-}
-
-export class UpdatePatientDto {
-  @IsString()
-  firstName: string;
-
-  @IsString()
-  lastName: string;
-
-  @IsString()
-  birthDate: string;
-
-  @IsString()
-  identification: string;
-
-  @IsString()
-  subDistrict: string;
-
-  @IsString()
-  district: string;
-
-  @IsString()
-  province: string;
-
-  @IsString()
-  zipCode: string;
-
-  @IsString()
-  phone: string;
-
-  @IsString()
-  sex: string;
-
-  @IsNumber()
-  lat: number;
-
-  @IsNumber()
-  lng: number;
-}
+@InputType()
+export class UpdatePatientDto extends PartialType(
+  OmitPrimaryGeneratedMetadata(Patient, ['reporterId', 'identification'] as const),
+  InputType,
+) {}
