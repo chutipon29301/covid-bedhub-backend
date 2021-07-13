@@ -1,5 +1,5 @@
 import { define } from 'typeorm-seeding';
-import { Officer } from '../entities';
+import { Officer } from '@entity';
 import { internet } from 'faker';
 
 define(Officer, () => {

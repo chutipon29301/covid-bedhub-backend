@@ -1,12 +1,10 @@
 import { Body, Controller, Delete, Get, Patch, Post } from '@nestjs/common';
 
-import { UserToken } from '../decorators/user-token.decorator';
+import { UserToken, IdParam, Roles } from '@decorator';
 import { JwtPayload } from '../jwt-auth/dto/jwt-auth.dto';
 import { HospitalService } from './hospital.service';
 import { CreateHospitalDto, UpdateCodeDto, UpdateHospitalDto } from './dto/hospital.dto';
-import { Hospital } from '../entities';
-import { IdParam } from '../decorators/express.decorator';
-import { Roles } from '../decorators/roles.decorator';
+import { Hospital } from '@entity';
 
 @Controller('hospital')
 export class HospitalController {

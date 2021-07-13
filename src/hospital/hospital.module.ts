@@ -3,7 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { HospitalService } from './hospital.service';
 import { HospitalController } from './hospital.controller';
-import { Hospital, AccessCode, Officer } from '../entities';
+import { Hospital, AccessCode, Officer } from '@entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Hospital, AccessCode, Officer])],

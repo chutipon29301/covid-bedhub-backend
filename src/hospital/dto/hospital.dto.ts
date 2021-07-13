@@ -1,5 +1,5 @@
 import { IsString, IsNumber, IsEnum } from 'class-validator';
-import { UserType } from '../../entities';
+import { UserType } from '@entity';
 
 export class CreateHospitalDto {
   @IsString()

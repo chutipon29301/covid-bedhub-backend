@@ -1,11 +1,9 @@
-import { Body, Controller, Get, Param, Patch, UnauthorizedException } from '@nestjs/common';
+import { Body, Controller, Get, Patch, UnauthorizedException } from '@nestjs/common';
 
-import { OfficerService } from './officer.service';
-import { Officer } from '../entities';
-import { IdParam } from '../decorators/express.decorator';
+import { Officer } from '@entity';
+import { IdParam, Roles, UserToken } from '@decorator';
 import { UpdateOfficerDto } from './dto/officer.dto';
-import { Roles } from '../decorators/roles.decorator';
-import { UserToken } from '../decorators/user-token.decorator';
+import { OfficerService } from './officer.service';
 import { JwtPayload } from '../jwt-auth/dto/jwt-auth.dto';
 
 @Controller('Officer')

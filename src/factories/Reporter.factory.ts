@@ -1,5 +1,5 @@
 import { define } from 'typeorm-seeding';
-import { Reporter } from '../entities';
+import { Reporter } from '@entity';
 import { finance } from 'faker';
 
 define(Reporter, () => {

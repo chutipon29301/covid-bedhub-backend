@@ -1,5 +1,5 @@
 import { define } from 'typeorm-seeding';
-import { Patient } from '../entities';
+import { Patient } from '@entity';
 import { name, date, datatype, address, phone } from 'faker';
 import { formatISO, subYears } from 'date-fns';
 

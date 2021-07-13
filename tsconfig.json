@@ -12,7 +12,8 @@
     "baseUrl": "./",
     "incremental": true,
     "paths": {
-      "@decorator": ["src/decorators"]
+      "@decorator": ["src/decorators"],
+      "@entity": ["src/entities"]
     }
   }
 }

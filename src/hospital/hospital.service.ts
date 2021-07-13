@@ -5,7 +5,7 @@ import { nanoid } from 'nanoid';
 
 import { CrudService } from '../libs/crud.service';
 import { CreateHospitalDto } from './dto/hospital.dto';
-import { AccessCode, Officer, UserType, Hospital } from '../entities';
+import { AccessCode, Officer, UserType, Hospital } from '@entity';
 
 @Injectable()
 export class HospitalService extends CrudService<Hospital> {

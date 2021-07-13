@@ -1,5 +1,5 @@
 import { define } from 'typeorm-seeding';
-import { Hospital } from '../entities';
+import { Hospital } from '@entity';
 import { company, address, phone } from 'faker';
 
 define(Hospital, () => {
