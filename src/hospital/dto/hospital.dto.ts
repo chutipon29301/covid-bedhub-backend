@@ -1,5 +1,7 @@
 import { IsString, IsNumber, IsEnum } from 'class-validator';
-import { UserType } from '@entity';
+import { AccessCode, Hospital, UserType } from '@entity';
+import { InputType, PartialType, PickType } from '@nestjs/graphql';
+import { OmitPrimaryGeneratedMetadata } from '../../entities/PrimaryGenerated.abstract';
 
 export class CreateHospitalDto {
   @IsString()
@@ -60,3 +62,12 @@ export class UpdateHospitalDto {
   @IsNumber()
   lng: number;
 }
+
+@InputType()
+export class UpdateAccessCodeDto extends PickType(AccessCode, ['accessCode', 'userType'] as const, InputType) {}
+
+@InputType()
+export class EditHospitalDto extends PartialType(
+  OmitPrimaryGeneratedMetadata(Hospital, ['location'] as const),
+  InputType,
+) {}

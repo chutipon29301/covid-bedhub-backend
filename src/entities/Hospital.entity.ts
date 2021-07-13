@@ -1,30 +1,39 @@
 import { Column, Entity, OneToMany } from 'typeorm';
-import { AccessCode } from './AccessCode.entity';
-import { Officer } from './Officer.entity';
-import { PrimaryGeneratedEntity } from './PrimaryGenerated.abstract';
-import { Ticket } from './Ticket.entity';
+import { Field, ObjectType } from '@nestjs/graphql';
 import { Point } from 'geojson';
 
+import { AccessCode, Officer, Ticket } from '.';
+import { PrimaryGeneratedEntity } from './PrimaryGenerated.abstract';
+import { PointObjectType } from '../types';
+
+@ObjectType()
 @Entity()
 export class Hospital extends PrimaryGeneratedEntity {
+  @Field()
   @Column()
   name: string;
 
+  @Field()
   @Column()
   subDistrict: string;
 
+  @Field()
   @Column()
   district: string;
 
+  @Field()
   @Column()
   province: string;
 
+  @Field()
   @Column()
   zipCode: string;
 
+  @Field()
   @Column()
   tel: string;
 
+  @Field(() => PointObjectType)
   @Column({
     type: 'geography',
     spatialFeatureType: 'Point',

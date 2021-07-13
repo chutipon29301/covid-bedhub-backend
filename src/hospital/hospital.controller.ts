@@ -9,15 +9,18 @@ import { Hospital } from '@entity';
 @Controller('hospital')
 export class HospitalController {
   constructor(private readonly hospitalService: HospitalService) {}
+
   @Get()
   async list(): Promise<Hospital[]> {
     return this.hospitalService.findMany();
   }
+
   @Roles('code_generator')
   @Get('/:id')
   async show(@IdParam() id: number): Promise<Hospital> {
     return this.hospitalService.findOfficerHospital(id);
   }
+
   @Roles('code_generator')
   @Post('/:id')
   async add(@Body() body: CreateHospitalDto): Promise<Hospital> {
