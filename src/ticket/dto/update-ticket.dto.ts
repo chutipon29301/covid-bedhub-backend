@@ -19,7 +19,7 @@ export class UpdateHospitalTicketDto {
   @IsInt()
   patientId: number;
 
-  @IsIn([TicketStatus.HOSPITAL_CANCEL, TicketStatus.ACCEPTED])
+  @IsIn([TicketStatus.HOSPITAL_CANCEL])
   status: TicketStatus;
 
   @IsString()

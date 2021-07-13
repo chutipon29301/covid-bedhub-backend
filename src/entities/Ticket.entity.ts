@@ -1,5 +1,7 @@
+import { Field, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { Point } from 'geojson';
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import { PointObjectType } from '../types';
 import { Hospital } from './Hospital.entity';
 import { Officer } from './Officer.entity';
 import { Patient } from './Patient.entity';
@@ -9,10 +11,10 @@ import { Vaccine } from './Vaccine.entity';
 export enum TicketStatus {
   REQUEST = 'REQUEST', // Patient create ticket
   MATCH = 'MATCH', // Hospital accept
-  ACCEPTED = 'ACCEPTED', // Patient accept
   HOSPITAL_CANCEL = 'HOSPITAL_CANCEL',
   PATIENT_CANCEL = 'PATIENT_CANCEL',
 }
+registerEnumType(TicketStatus, { name: 'TicketStatus' });
 
 export enum Symptom {
   FEVER = 'FEVER', // 1
@@ -26,17 +28,24 @@ export enum Symptom {
   CHEST_PAIN = 'CHEST_PAIN', //3
   UNCONCIOUS = 'UNCONCIOUS', //3
 }
+registerEnumType(Symptom, { name: 'Symptom' });
+
+@ObjectType()
 @Entity()
 export class Ticket extends PrimaryGeneratedEntity {
+  @Field()
   @Column()
   patientId: number;
 
+  @Field()
   @Column('date')
   examReceiveDate: string;
 
+  @Field()
   @Column('date')
   examDate: string;
 
+  @Field(() => [Symptom])
   @Column({
     type: 'enum',
     enum: Symptom,
@@ -44,6 +53,7 @@ export class Ticket extends PrimaryGeneratedEntity {
   })
   symptoms: Symptom[];
 
+  @Field(() => TicketStatus)
   @Column({
     type: 'enum',
     enum: TicketStatus,
@@ -51,20 +61,24 @@ export class Ticket extends PrimaryGeneratedEntity {
   })
   status: TicketStatus;
 
+  @Field()
   @Column({
     type: 'date',
     nullable: true,
   })
   appointedDate?: string;
 
+  @Field()
   @Column({
     nullable: true,
   })
   notes?: string;
 
+  @Field(() => Int)
   @Column('int')
   riskLevel: number;
 
+  @Field(() => PointObjectType)
   @Column({
     type: 'geography',
     spatialFeatureType: 'Point',
@@ -72,11 +86,13 @@ export class Ticket extends PrimaryGeneratedEntity {
   })
   location: Point;
 
+  @Field()
   @Column({
     nullable: true,
   })
   hospitalId?: number;
 
+  @Field()
   @Column({
     nullable: true,
   })

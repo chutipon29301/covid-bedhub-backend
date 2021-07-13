@@ -19,7 +19,7 @@ export class AppointmentService {
       where: {
         hospitalId: officer.hospitalId,
         patientId: patient.id,
-        status: TicketStatus.ACCEPTED,
+        status: TicketStatus.MATCH,
       },
       order: { id: 'DESC' },
     });

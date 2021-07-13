@@ -1,9 +1,10 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Vaccine, Symptom, Ticket, TicketStatus, Officer, Patient } from '@entity';
-import { In, Repository } from 'typeorm';
+import { FindConditions, In, Repository } from 'typeorm';
 import { CrudService } from '../libs/crud.service';
-import { CreateTicketDto } from './dto/create-ticket.dto';
+import { CreateTicketDto, EditTicketDto } from './dto/ticket.dto';
+// import { CreateTicketDto } from './dto/create-ticket.dto';
 
 @Injectable()
 export class TicketService extends CrudService<Ticket> {
@@ -15,51 +16,60 @@ export class TicketService extends CrudService<Ticket> {
   ) {
     super(repo);
   }
-  public async checkTicketBelongToRequester(userId: number, patientId): Promise<boolean> {
-    const patient = await this.patientRepo.findOne({ id: patientId, reporterId: userId });
-    return patient != null;
-  }
-  public async listAllTicketsOfReporter(reporterId: number): Promise<Ticket[]> {
-    const tickets = await this.repo
-      .createQueryBuilder('ticket')
-      .innerJoinAndSelect('ticket.patient', 'patient')
-      .where('patient.reporterId = :reporterId', { reporterId })
-      .getMany();
-    return tickets;
-  }
-  public async listAllHospitalTickets(userId: number, ticketStatus: TicketStatus): Promise<Ticket[]> {
-    const officer = await this.officerRepo.findOne({ id: userId });
-    if (officer && ticketStatus) {
-      return await this.repo.find({ where: { hospitalId: officer.hospitalId, status: ticketStatus } });
-    }
-    return await this.repo.find({ where: { hospitalId: officer.hospitalId, relation: ['patient'] } });
-  }
-  public async createOne(body: CreateTicketDto): Promise<Ticket> {
-    // body.
-    const existingTicket = await this.repo.find({
+
+  // async checkTicketBelongToRequester(userId: number, patientId): Promise<boolean> {
+  //   const patient = await this.patientRepo.findOne({ id: patientId, reporterId: userId });
+  //   return patient != null;
+  // }
+
+  // async listAllTicketsOfReporter(reporterId: number): Promise<Ticket[]> {
+  //   const tickets = await this.repo
+  //     .createQueryBuilder('ticket')
+  //     .innerJoinAndSelect('ticket.patient', 'patient')
+  //     .where('patient.reporterId = :reporterId', { reporterId })
+  //     .getMany();
+  //   return tickets;
+  // }
+
+  // async listAllHospitalTickets(userId: number, ticketStatus: TicketStatus): Promise<Ticket[]> {
+  //   const officer = await this.officerRepo.findOne({ id: userId });
+  //   if (officer && ticketStatus) {
+  //     return await this.repo.find({ where: { hospitalId: officer.hospitalId, status: ticketStatus } });
+  //   }
+  //   return await this.repo.find({ where: { hospitalId: officer.hospitalId, relation: ['patient'] } });
+  // }
+
+  async create(data: CreateTicketDto): Promise<Ticket> {
+    const existingTicket = await this.repo.findOne({
       where: {
-        patientId: body.patientId,
-        status: In([TicketStatus.ACCEPTED, TicketStatus.MATCH, TicketStatus.REQUEST]),
+        patientId: data.patientId,
+        status: In([TicketStatus.MATCH, TicketStatus.REQUEST]),
       },
     });
-    if (existingTicket.length > 0) {
-      throw new InternalServerErrorException('Patient already create ticket');
+    if (existingTicket) {
+      throw new BadRequestException('Patient already create ticket');
     }
-    const ticket = new Ticket();
-    ticket.patientId = body.patientId;
-    ticket.examReceiveDate = body.examReceiveDate;
-    ticket.examDate = body.examDate;
-    ticket.symptoms = body.symptoms;
-    ticket.riskLevel = await this.calculateRiskLevel(body.patientId, body.symptoms);
-    const newTicket = await this.create(ticket);
-    body.vaccines.forEach(async vaccine => {
-      vaccine.ticketId = newTicket.id;
+    const riskLevel = await this.calculateRiskLevel(data.patientId, data.symptoms);
+    const ticket = await super.create({
+      ...data,
+      riskLevel,
+      location: { type: 'Point', coordinates: [data.lat, data.lng] },
     });
-    await this.vaccineRepo.save(body.vaccines);
-    return newTicket;
+    const vaccines: Vaccine[] = [];
+    for (const vaccine of data.vaccines) {
+      vaccines.push({ ...new Vaccine(), ...vaccine, ticketId: ticket.id });
+    }
+    await this.vaccineRepo.save(vaccines);
+    return ticket;
   }
 
-  public async calculateRiskLevel(patientId: number, symptoms: Symptom[]): Promise<number> {
+  async updateTicket(conditions: FindConditions<Ticket>, dto: EditTicketDto): Promise<Ticket> {
+    const ticket = await super.updateOne(conditions, dto);
+    const riskLevel = await this.calculateRiskLevel(ticket.patientId, ticket.symptoms);
+    return super.updateOne(conditions, { riskLevel });
+  }
+
+  private async calculateRiskLevel(patientId: number, symptoms: Symptom[]): Promise<number> {
     let riskLevel = 0;
     const risk1 = [Symptom.FEVER, Symptom.COUGH, Symptom.SMELLESS_RASH];
     const risk2 = [Symptom.DIARRHEA, Symptom.TIRED_HEADACHE, Symptom.DIFFICULT_BREATHING, Symptom.ANGINA];
