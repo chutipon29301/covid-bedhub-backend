@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { HospitalService } from './hospital.service';
-import { HospitalController } from './hospital.controller';
 import { Hospital, AccessCode, Officer } from '@entity';
+import { HospitalController } from './hospital.controller';
+import { HospitalService } from './hospital.service';
 import { HospitalResolver } from './hospital.resolver';
 
 @Module({

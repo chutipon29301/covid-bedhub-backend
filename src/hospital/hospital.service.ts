@@ -1,20 +1,29 @@
 import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { nanoid } from 'nanoid';
+import * as DataLoader from 'dataloader';
 
+import { AccessCode, Officer, UserType, Hospital } from '@entity';
 import { CrudService } from '../libs/crud.service';
 import { CreateHospitalDto } from './dto/hospital.dto';
-import { AccessCode, Officer, UserType, Hospital } from '@entity';
 
 @Injectable()
 export class HospitalService extends CrudService<Hospital> {
+  readonly findAccessCode: DataLoader<number, AccessCode[]>;
   constructor(
     @InjectRepository(Officer) private readonly officerRepo: Repository<Officer>,
     @InjectRepository(AccessCode) private readonly accessCodeRepo: Repository<AccessCode>,
     @InjectRepository(Hospital) repo: Repository<Hospital>,
   ) {
     super(repo);
+
+    this.findAccessCode = new DataLoader<number, AccessCode[]>(async hospitalIds => {
+      const accessCodes = await this.accessCodeRepo.find({
+        where: { hospitalId: In([...hospitalIds]) },
+      });
+      return hospitalIds.map(hospitalId => accessCodes.filter(o => o.hospitalId === hospitalId));
+    });
   }
 
   async createOne(body: CreateHospitalDto): Promise<Hospital> {
