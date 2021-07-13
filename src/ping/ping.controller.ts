@@ -1,7 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
-import { AllowAnyPermission } from '../decorators/allow-any-permission.decorator';
-import { AllowUnauthenticated } from '../decorators/allow-unauthenticated.decorator';
-import { Roles } from '../decorators/roles.decorator';
+import { AllowAnyPermission, AllowUnauthenticated, Roles } from '@decorator';
 
 @Controller('ping')
 export class PingController {

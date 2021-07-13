@@ -1,7 +1,5 @@
-import { IsString, IsNumber, IsInt, IsArray, IsEnum, IsIn } from 'class-validator';
-import { toDate } from 'date-fns';
-import { Symptom, TicketStatus } from '../../entities';
-import { Vaccine } from '../../entities/Vaccine.entity';
+import { IsString, IsInt, IsIn } from 'class-validator';
+import { Symptom, TicketStatus } from '@entity';
 
 export class UpdatePatientTicketDto {
   @IsInt()

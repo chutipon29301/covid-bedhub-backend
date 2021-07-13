@@ -1,5 +1,5 @@
 import { define } from 'typeorm-seeding';
-import { AccessCode } from '../entities';
+import { AccessCode } from '@entity';
 import { nanoid } from 'nanoid';
 
 define(AccessCode, () => {

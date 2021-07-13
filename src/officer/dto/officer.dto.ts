@@ -1,5 +1,5 @@
 import { IsString, IsInt, IsEnum } from 'class-validator';
-import { OfficerRole } from '../../entities/Officer.entity';
+import { OfficerRole } from '@entity';
 
 export class UpdateOfficerDto {
   @IsString()

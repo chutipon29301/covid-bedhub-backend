@@ -3,24 +3,20 @@ import {
   Controller,
   Delete,
   Get,
-  InternalServerErrorException,
   NotFoundException,
   Patch,
   Post,
   Query,
   UnauthorizedException,
 } from '@nestjs/common';
-import { UserToken } from '../decorators/user-token.decorator';
+import { UserToken, IdParam, Roles } from '@decorator';
 import { JwtPayload } from '../jwt-auth/dto/jwt-auth.dto';
-import { AllowUnauthenticated } from '../decorators/allow-unauthenticated.decorator';
-import { IdParam } from '../decorators/id.decorator';
-import { Ticket, TicketStatus } from '../entities/Ticket.entity';
+import { Ticket, TicketStatus } from '@entity';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 import { UpdateHospitalTicketDto, UpdatePatientTicketDto } from './dto/update-ticket.dto';
 import { TicketService } from './ticket.service';
 import { differenceInDays, parseISO } from 'date-fns';
 import { QueryTicketDto } from './dto/list-ticket.dto';
-import { Roles } from '../decorators/roles.decorator';
 
 @Controller('ticket')
 export class TicketController {

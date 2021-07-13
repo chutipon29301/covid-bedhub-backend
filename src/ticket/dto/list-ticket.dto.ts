@@ -1,5 +1,5 @@
 import { IsEnum } from 'class-validator';
-import { TicketStatus } from '../../entities';
+import { TicketStatus } from '@entity';
 
 export class QueryTicketDto {
   @IsEnum(TicketStatus)

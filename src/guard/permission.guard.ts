@@ -1,7 +1,8 @@
-import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext, ContextType } from '@nestjs/common';
 import { Request } from 'express';
 import { Reflector } from '@nestjs/core';
 import { AccountType } from '../jwt-auth/dto/jwt-auth.dto';
+import { GqlExecutionContext } from '@nestjs/graphql';
 
 @Injectable()
 export class PermissionsGuard implements CanActivate {
@@ -12,7 +13,12 @@ export class PermissionsGuard implements CanActivate {
 
     if (allowUnauthenticated) return true;
 
-    const request = context.switchToHttp().getRequest() as Request;
+    let request: Request;
+    if (context.getType() === ('graphql' as ContextType)) {
+      request = GqlExecutionContext.create(context).getContext().req;
+    } else {
+      request = context.switchToHttp().getRequest();
+    }
     if (!(process.env.NODE_ENV !== 'production' && request.authenticationType === 'development')) {
       return false;
     }

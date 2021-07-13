@@ -1,4 +1,6 @@
-export type AccountType = 'reporter' | 'staff' | 'queue_manager' | 'code_generator';
+import { Field, ObjectType } from '@nestjs/graphql';
+
+export type AccountType = 'reporter' | 'staff' | 'queue_manager' | 'code_generator' | 'super_admin';
 
 export interface JwtPayload {
   id: number;
@@ -6,7 +8,10 @@ export interface JwtPayload {
   hasProfile?: boolean;
 }
 
-export interface JwtTokenInfo {
+@ObjectType()
+export class JwtTokenInfo {
+  @Field()
   token: string;
+  @Field()
   expireDate: Date;
 }

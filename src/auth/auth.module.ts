@@ -4,10 +4,11 @@ import { AuthController } from './auth.controller';
 import { LineModule } from '../line/line.module';
 import { UserModule } from '../user/user.module';
 import { JwtAuthModule } from '../jwt-auth/jwt-auth.module';
+import { AuthResolver } from './auth.resolver';
 
 @Module({
   imports: [HttpModule, LineModule, UserModule, JwtAuthModule],
-  providers: [AuthService],
+  providers: [AuthService, AuthResolver],
   controllers: [AuthController],
 })
 export class AuthModule {}

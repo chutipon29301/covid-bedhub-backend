@@ -1,12 +1,9 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Vaccine } from '../entities/Vaccine.entity';
+import { Vaccine, Symptom, Ticket, TicketStatus, Officer, Patient } from '@entity';
 import { In, Repository } from 'typeorm';
-import { Symptom, Ticket, TicketStatus } from '../entities/Ticket.entity';
 import { CrudService } from '../libs/crud.service';
 import { CreateTicketDto } from './dto/create-ticket.dto';
-import { Officer } from '../entities/Officer.entity';
-import { Patient } from '../entities/Patient.entity';
 
 @Injectable()
 export class TicketService extends CrudService<Ticket> {

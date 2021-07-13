@@ -1,6 +1,6 @@
 import { Controller, Get } from '@nestjs/common';
 import { HealthCheck, HealthCheckService, TypeOrmHealthIndicator } from '@nestjs/terminus';
-import { AllowUnauthenticated } from '../decorators/allow-unauthenticated.decorator';
+import { AllowUnauthenticated } from '@decorator';
 
 @Controller('health')
 export class HealthController {

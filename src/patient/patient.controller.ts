@@ -1,12 +1,10 @@
-import { Body, Controller, Delete, Get, NotFoundException, Patch, Post, UnauthorizedException } from '@nestjs/common';
-import { IdParam } from '../decorators/id.decorator';
-import { AllowUnauthenticated } from '../decorators/allow-unauthenticated.decorator';
+import { Body, Controller, Delete, Get, NotFoundException, Patch, Post } from '@nestjs/common';
+import { Patient } from '@entity';
+import { IdParam, UserToken, Roles } from '@decorator';
+
 import { PatientService } from './patient.service';
 import { CreatePatientDto, UpdatePatientDto } from './dto/patient.dto';
-import { Patient } from '../entities';
-import { UserToken } from '../decorators/user-token.decorator';
 import { JwtPayload } from '../jwt-auth/dto/jwt-auth.dto';
-import { Roles } from '../decorators/roles.decorator';
 
 @Controller('patient')
 export class PatientController {

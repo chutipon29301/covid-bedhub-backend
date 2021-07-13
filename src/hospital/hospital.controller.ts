@@ -1,25 +1,26 @@
 import { Body, Controller, Delete, Get, Patch, Post } from '@nestjs/common';
 
-import { UserToken } from '../decorators/user-token.decorator';
+import { UserToken, IdParam, Roles } from '@decorator';
 import { JwtPayload } from '../jwt-auth/dto/jwt-auth.dto';
 import { HospitalService } from './hospital.service';
 import { CreateHospitalDto, UpdateCodeDto, UpdateHospitalDto } from './dto/hospital.dto';
-import { Hospital } from '../entities';
-import { IdParam } from '../decorators/id.decorator';
-import { Roles } from '../decorators/roles.decorator';
+import { Hospital } from '@entity';
 
 @Controller('hospital')
 export class HospitalController {
   constructor(private readonly hospitalService: HospitalService) {}
+
   @Get()
   async list(): Promise<Hospital[]> {
     return this.hospitalService.findMany();
   }
+
   @Roles('code_generator')
   @Get('/:id')
   async show(@IdParam() id: number): Promise<Hospital> {
     return this.hospitalService.findOfficerHospital(id);
   }
+
   @Roles('code_generator')
   @Post('/:id')
   async add(@Body() body: CreateHospitalDto): Promise<Hospital> {

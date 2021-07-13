@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post, Query, Res, UnauthorizedException } from '@nestjs/common';
 import { Response } from 'express';
-import { AllowUnauthenticated } from '../decorators/allow-unauthenticated.decorator';
+import { AllowUnauthenticated } from '@decorator';
 import { JwtTokenInfo } from '../jwt-auth/dto/jwt-auth.dto';
 import { AuthService } from './auth.service';
 import { RequestTokenDto } from './dto/auth.dto';

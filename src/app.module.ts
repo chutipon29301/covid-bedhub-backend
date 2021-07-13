@@ -2,6 +2,7 @@ import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TerminusModule } from '@nestjs/terminus';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { GraphQLModule } from '@nestjs/graphql';
 import { config, Env } from './config';
 import { HealthController } from './health/health.controller';
 import { HospitalModule } from './hospital/hospital.module';
@@ -32,6 +33,16 @@ import { AppointmentModule } from './appointment/appointment.module';
       useFactory: (config: ConfigService<Env>): TypeOrmModuleOptions => {
         return config.get('databaseConfig');
       },
+    }),
+    GraphQLModule.forRootAsync({
+      imports: [ConfigModule.forRoot()],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        autoSchemaFile: true,
+        playground: configService.get<string>('NODE_ENV') !== 'production',
+        context: ({ req }) => ({ req }),
+        fieldResolverEnhancers: ['guards'],
+      }),
     }),
     HospitalModule,
     PatientModule,

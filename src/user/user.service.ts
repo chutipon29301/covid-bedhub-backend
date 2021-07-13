@@ -1,6 +1,6 @@
 import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Hospital, Reporter, Officer } from '../entities';
+import { Hospital, Reporter, Officer } from '@entity';
 import { Repository } from 'typeorm';
 import { CreateOfficerDto } from './dto/user.dto';
 

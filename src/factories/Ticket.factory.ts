@@ -1,6 +1,6 @@
 import { formatISO } from 'date-fns';
 import { define } from 'typeorm-seeding';
-import { Symptom, Ticket, TicketStatus } from '../entities';
+import { Symptom, Ticket, TicketStatus } from '@entity';
 import { date, lorem, random, datatype, address } from 'faker';
 
 define(Ticket, () => {

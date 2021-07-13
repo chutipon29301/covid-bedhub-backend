@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CrudService } from '../libs/crud.service';
 import { Repository } from 'typeorm';
 
-import { Officer } from '../entities';
+import { Officer } from '@entity';
 
 @Injectable()
 export class OfficerService extends CrudService<Officer> {

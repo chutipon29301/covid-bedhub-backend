@@ -5,7 +5,7 @@ import { nanoid } from 'nanoid';
 
 import { CrudService } from '../libs/crud.service';
 import { CreateHospitalDto } from './dto/hospital.dto';
-import { AccessCode, Officer, UserType, Hospital } from '../entities';
+import { AccessCode, Officer, UserType, Hospital } from '@entity';
 
 @Injectable()
 export class HospitalService extends CrudService<Hospital> {
@@ -17,7 +17,7 @@ export class HospitalService extends CrudService<Hospital> {
     super(repo);
   }
 
-  public async createOne(body: CreateHospitalDto): Promise<Hospital> {
+  async createOne(body: CreateHospitalDto): Promise<Hospital> {
     const staffAccessCode = new AccessCode();
     const queueAccessCode = new AccessCode();
     staffAccessCode.accessCode = nanoid(6);
@@ -37,20 +37,12 @@ export class HospitalService extends CrudService<Hospital> {
     return hospital;
   }
 
-  public async findOfficerHospital(userId: number): Promise<Hospital> {
-    try {
-      const officer = await this.officerRepo.findOne({ id: userId });
-      const hospital = await this.repo.findOne({ id: officer.hospitalId });
-      return hospital;
-    } catch (error) {
-      if (error instanceof HttpException) {
-        throw error;
-      } else {
-        throw new NotFoundException(error.message);
-      }
-    }
+  async findOfficerHospital(userId: number): Promise<Hospital> {
+    const officer = await this.officerRepo.findOne({ id: userId });
+    return this.repo.findOne({ id: officer.hospitalId });
   }
-  public async updateCode(userId: number, userType: UserType, newCode: string): Promise<Hospital> {
+
+  async updateCode(userId: number, userType: UserType, newCode: string): Promise<Hospital> {
     try {
       const officer = await this.officerRepo.findOne({ id: userId });
       const hospital = await this.repo.findOne({ id: officer.hospitalId });
