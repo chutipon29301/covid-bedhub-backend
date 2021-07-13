@@ -7,3 +7,4 @@ export class QueryTicketDto {
   @IsEnum(TicketStatus)
   ticketStatus: TicketStatus;
 }
+

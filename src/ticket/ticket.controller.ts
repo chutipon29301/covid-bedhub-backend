@@ -37,6 +37,7 @@ export class TicketController {
     // return this.ticketService.listAllTicketsOfReporter(user.id);
     return;
   }
+
   @Roles('queue_manager')
   @Get('/hospital')
   async listHospitalTicket(@UserToken() user: JwtPayload, @Query() query: QueryTicketDto): Promise<Ticket[]> {
@@ -53,7 +54,6 @@ export class TicketController {
   async edit(@UserToken() user: JwtPayload, @IdParam() id: number, @Body() ticket: UpdatePatientTicketDto) {
     return this.ticketService.updateOne({ id }, ticket);
   }
-
   @Roles('queue_manager')
   @Patch('/hospital/:id')
   async editHospitalTicket(
