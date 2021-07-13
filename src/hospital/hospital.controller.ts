@@ -16,7 +16,12 @@ export class HospitalController {
     return this.hospitalService.findMany();
   }
   @Roles('code_generator')
-  @Post()
+  @Get('/:id')
+  async show(@IdParam() id: number): Promise<Hospital> {
+    return this.hospitalService.findOfficerHospital(id);
+  }
+  @Roles('code_generator')
+  @Post('/:id')
   async add(@Body() body: CreateHospitalDto): Promise<Hospital> {
     return await this.hospitalService.createOne(body);
   }

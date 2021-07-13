@@ -37,6 +37,19 @@ export class HospitalService extends CrudService<Hospital> {
     return hospital;
   }
 
+  public async findOfficerHospital(userId: number): Promise<Hospital> {
+    try {
+      const officer = await this.officerRepo.findOne({ id: userId });
+      const hospital = await this.repo.findOne({ id: officer.hospitalId });
+      return hospital;
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      } else {
+        throw new NotFoundException(error.message);
+      }
+    }
+  }
   public async updateCode(userId: number, userType: UserType, newCode: string): Promise<Hospital> {
     try {
       const officer = await this.officerRepo.findOne({ id: userId });

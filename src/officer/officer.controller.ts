@@ -12,7 +12,7 @@ import { JwtPayload } from '../jwt-auth/dto/jwt-auth.dto';
 export class OfficerController {
   constructor(private readonly officerService: OfficerService) {}
 
-  @Roles('queue_manager')
+  @Roles('code_generator', 'queue_manager')
   @Get('/:id')
   async get(@UserToken() user: JwtPayload, @IdParam() id: number): Promise<Officer> {
     if (user.id == id) {
