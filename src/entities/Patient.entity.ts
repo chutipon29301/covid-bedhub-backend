@@ -2,6 +2,7 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from 'type
 import { PrimaryGeneratedEntity } from './PrimaryGenerated.abstract';
 import { Ticket } from './Ticket.entity';
 import { Reporter } from './Reporter.entity';
+import { Field, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
 
 export enum Illness {
   NCDs = 'NCDs', // โรคทางเดินหายใจเรื้อรัง
@@ -12,42 +13,56 @@ export enum Illness {
   CANCER = 'CANCER', //โรคมะเร็ง
   DIABETES = 'DIABETES', //โรคเบาหวาน
 }
+registerEnumType(Illness, { name: 'Illness' });
 
+@ObjectType()
 @Entity()
 export class Patient extends PrimaryGeneratedEntity {
+  @Field(() => Int)
   @Column('int')
   reporterId: number;
 
+  @Field()
   @Column()
   firstName: string;
 
+  @Field()
   @Column()
   lastName: string;
 
+  @Field()
   @Column('date')
   birthDate: string;
 
+  @Field()
   @Column({ unique: true })
   identification: string;
 
+  @Field()
   @Column()
   subDistrict: string;
 
+  @Field()
   @Column()
   district: string;
 
+  @Field()
   @Column()
   province: string;
 
+  @Field()
   @Column()
   zipCode: string;
 
+  @Field()
   @Column()
   tel: string;
 
+  @Field()
   @Column()
   sex: string;
 
+  @Field(() => [Illness])
   @Column({
     type: 'enum',
     enum: Illness,

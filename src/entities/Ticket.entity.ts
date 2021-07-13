@@ -1,4 +1,6 @@
+import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { Point } from 'geojson';
+import { PointObjectType } from 'src/types';
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { Hospital } from './Hospital.entity';
 import { Officer } from './Officer.entity';
@@ -26,17 +28,21 @@ export enum Symptom {
   CHEST_PAIN = 'CHEST_PAIN', //3
   UNCONCIOUS = 'UNCONCIOUS', //3
 }
+@ObjectType()
 @Entity()
 export class Ticket extends PrimaryGeneratedEntity {
   @Column()
   patientId: number;
 
+  @Field()
   @Column('date')
   examReceiveDate: string;
 
+  @Field()
   @Column('date')
   examDate: string;
 
+  @Field(() => [Symptom])
   @Column({
     type: 'enum',
     enum: Symptom,
@@ -44,6 +50,7 @@ export class Ticket extends PrimaryGeneratedEntity {
   })
   symptoms: Symptom[];
 
+  @Field(() => TicketStatus)
   @Column({
     type: 'enum',
     enum: TicketStatus,
@@ -51,20 +58,24 @@ export class Ticket extends PrimaryGeneratedEntity {
   })
   status: TicketStatus;
 
+  @Field()
   @Column({
     type: 'date',
     nullable: true,
   })
   appointedDate?: string;
 
+  @Field()
   @Column({
     nullable: true,
   })
   notes?: string;
 
+  @Field(() => Int)
   @Column('int')
   riskLevel: number;
 
+  @Field(() => PointObjectType)
   @Column({
     type: 'geography',
     spatialFeatureType: 'Point',

@@ -3,27 +3,32 @@ import { PrimaryGeneratedEntity } from './PrimaryGenerated.abstract';
 import { hashSync } from 'bcrypt';
 import { Hospital } from './Hospital.entity';
 import { Ticket } from './Ticket.entity';
+import { Field, ObjectType } from '@nestjs/graphql';
 
 export enum OfficerRole {
   CODE_GENERATOR = 'CODE_GENERATOR',
   QUEUE_MANAGER = 'QUEUE_MANAGER',
   STAFF = 'STAFF',
 }
-
+@ObjectType()
 @Entity()
 export class Officer extends PrimaryGeneratedEntity {
+  @Field()
   @Column({ unique: true })
   username: string;
 
+  @Field()
   @Column()
   password: string;
 
+  @Field()
   @Column({ type: 'enum', enum: OfficerRole })
   role: OfficerRole;
 
   @Column()
   hospitalId: number;
 
+  @Field()
   @Column({ nullable: true })
   employeeCode: string;
 
