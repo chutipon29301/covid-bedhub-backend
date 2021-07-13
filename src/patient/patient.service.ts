@@ -13,12 +13,13 @@ export class PatientService extends CrudService<Patient> {
   ) {
     super(repo);
   }
-  public async createOne(body: CreatePatientDto): Promise<Patient> {
-    // body.
-    const patient = await this.create(body);
-    const reporter = await this.reporterRepo.findOne({ id: body.reporterId });
-    reporter.defaultPatientId = patient.id;
-    await this.reporterRepo.update({ id: body.reporterId }, reporter);
+  async createPatient(reporterId: number, body: CreatePatientDto): Promise<Patient> {
+    const reporter = await this.reporterRepo.findOne({ id: reporterId });
+    const patient = await this.create({ ...body, reporterId });
+    if (!reporter.defaultPatientId) {
+      reporter.defaultPatientId = patient.id;
+      await this.reporterRepo.save(reporter);
+    }
     return patient;
   }
 }
