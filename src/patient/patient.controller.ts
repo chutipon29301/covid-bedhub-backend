@@ -6,7 +6,7 @@ import { CreatePatientDto, UpdatePatientDto } from './dto/patient.dto';
 import { Patient } from '../entities';
 import { UserToken } from '../decorators/user-token.decorator';
 import { JwtPayload } from '../jwt-auth/dto/jwt-auth.dto';
-import { Roles } from 'src/decorators/roles.decorator';
+import { Roles } from '../decorators/roles.decorator';
 
 @Controller('patient')
 export class PatientController {

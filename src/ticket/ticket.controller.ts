@@ -19,7 +19,7 @@ import { UpdateHospitalTicketDto, UpdatePatientTicketDto } from './dto/update-ti
 import { TicketService } from './ticket.service';
 import { differenceInDays, parseISO } from 'date-fns';
 import { QueryTicketDto } from './dto/list-ticket.dto';
-import { Roles } from 'src/decorators/roles.decorator';
+import { Roles } from '../decorators/roles.decorator';
 
 @Controller('ticket')
 export class TicketController {

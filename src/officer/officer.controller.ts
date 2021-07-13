@@ -6,7 +6,7 @@ import { IdParam } from '../decorators/id.decorator';
 import { UpdateOfficerDto } from './dto/officer.dto';
 import { Roles } from '../decorators/roles.decorator';
 import { UserToken } from '../decorators/user-token.decorator';
-import { JwtPayload } from 'src/jwt-auth/dto/jwt-auth.dto';
+import { JwtPayload } from '../jwt-auth/dto/jwt-auth.dto';
 
 @Controller('Officer')
 export class OfficerController {

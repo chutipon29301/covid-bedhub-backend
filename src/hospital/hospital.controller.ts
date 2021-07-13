@@ -6,7 +6,7 @@ import { HospitalService } from './hospital.service';
 import { CreateHospitalDto, UpdateCodeDto, UpdateHospitalDto } from './dto/hospital.dto';
 import { Hospital } from '../entities';
 import { IdParam } from '../decorators/id.decorator';
-import { Roles } from 'src/decorators/roles.decorator';
+import { Roles } from '../decorators/roles.decorator';
 
 @Controller('hospital')
 export class HospitalController {
