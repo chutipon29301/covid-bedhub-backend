@@ -27,8 +27,15 @@ export class TicketController {
 
   @Roles('reporter')
   @Get()
-  async list(@UserToken() user: JwtPayload): Promise<Ticket[]> {
+  async listTicketOfReporter(@UserToken() user: JwtPayload): Promise<Ticket[]> {
     return this.ticketService.listAllTicketsOfReporter(user.id);
+  }
+
+  @Roles('reporter')
+  @Get('/:id')
+  async list(@UserToken() user: JwtPayload, @IdParam() id: number): Promise<Ticket[]> {
+    // return this.ticketService.listAllTicketsOfReporter(user.id);
+    return;
   }
   @Roles('queue_manager')
   @Get('/hospital')

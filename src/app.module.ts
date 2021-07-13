@@ -16,6 +16,7 @@ import { AuthHeaderParserMiddleware } from './middleware/auth-header-parser.midd
 import { APP_GUARD } from '@nestjs/core';
 import { PermissionsGuard } from './guard/permission.guard';
 import { PingModule } from './ping/ping.module';
+import { OfficerModule } from './officer/officer.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { PingModule } from './ping/ping.module';
     }),
     HospitalModule,
     PatientModule,
+    OfficerModule,
     TicketModule,
     UserModule,
     LineModule,

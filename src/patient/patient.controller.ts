@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Patch, Post, UnauthorizedException } from '@nestjs/common';
+import { Body, Controller, Delete, Get, NotFoundException, Patch, Post, UnauthorizedException } from '@nestjs/common';
 import { IdParam } from '../decorators/id.decorator';
 import { AllowUnauthenticated } from '../decorators/allow-unauthenticated.decorator';
 import { PatientService } from './patient.service';
@@ -12,14 +12,20 @@ import { Roles } from 'src/decorators/roles.decorator';
 export class PatientController {
   constructor(private readonly patientService: PatientService) {}
 
-  @Roles('reporter', 'queue_manager')
+  @Roles('reporter')
   @Get()
   async list(@UserToken() user: JwtPayload): Promise<Patient[]> {
-    console.log(user);
-    if (user) {
-      return this.patientService.findMany({ reporterId: user.id });
+    return this.patientService.findMany({ reporterId: user.id });
+  }
+
+  @Roles('reporter')
+  @Get('/:id')
+  async getPatient(@UserToken() user: JwtPayload, @IdParam() id: number): Promise<Patient> {
+    const patient = await this.patientService.findOne({ where: { id, reporterId: user.id } });
+    if (!patient) {
+      throw new NotFoundException('User not found under reporters');
     }
-    throw new UnauthorizedException('User not allowed');
+    return patient;
   }
 
   @Roles('reporter', 'queue_manager')
@@ -30,8 +36,8 @@ export class PatientController {
   }
 
   @Patch('/:id')
-  async edit(@IdParam() id: number, @Body() Patient: UpdatePatientDto) {
-    return this.patientService.updateOne({ id }, Patient);
+  async edit(@IdParam() id: number, @Body() patient: UpdatePatientDto) {
+    return this.patientService.updateOne({ id }, patient);
   }
 
   @Delete('/:id')

@@ -24,6 +24,9 @@ export class Officer extends PrimaryGeneratedEntity {
   @Column()
   hospitalId: number;
 
+  @Column({ nullable: true })
+  employeeCode: string;
+
   @ManyToOne(() => Hospital, o => o.officers)
   @JoinColumn({ name: 'hospitalId', referencedColumnName: 'id' })
   hospital?: Hospital;
