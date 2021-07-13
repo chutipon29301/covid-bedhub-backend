@@ -2,6 +2,7 @@ import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TerminusModule } from '@nestjs/terminus';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { GraphQLModule } from '@nestjs/graphql';
 import { config, Env } from './config';
 import { HealthController } from './health/health.controller';
 import { HospitalModule } from './hospital/hospital.module';
@@ -17,7 +18,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { PermissionsGuard } from './guard/permission.guard';
 import { PingModule } from './ping/ping.module';
 import { OfficerModule } from './officer/officer.module';
-import { GraphQLModule } from '@nestjs/graphql';
+import { AppointmentModule } from './appointment/appointment.module';
 
 @Module({
   imports: [
@@ -53,6 +54,7 @@ import { GraphQLModule } from '@nestjs/graphql';
     JwtAuthModule,
     PingModule,
     InviteModule,
+    AppointmentModule,
   ],
   controllers: [HealthController],
   providers: [

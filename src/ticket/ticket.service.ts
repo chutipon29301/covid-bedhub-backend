@@ -15,6 +15,10 @@ export class TicketService extends CrudService<Ticket> {
   ) {
     super(repo);
   }
+  public async checkTicketBelongToRequester(userId: number, patientId): Promise<boolean> {
+    const patient = await this.patientRepo.findOne({ id: patientId, reporterId: userId });
+    return patient != null;
+  }
   public async listAllTicketsOfReporter(reporterId: number): Promise<Ticket[]> {
     const tickets = await this.repo
       .createQueryBuilder('ticket')
