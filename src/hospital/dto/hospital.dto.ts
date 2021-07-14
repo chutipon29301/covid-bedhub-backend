@@ -68,6 +68,6 @@ export class UpdateAccessCodeDto extends PickType(AccessCode, ['accessCode', 'us
 
 @InputType()
 export class EditHospitalDto extends PartialType(
-  OmitPrimaryGeneratedMetadata(Hospital, ['location'] as const),
+  OmitPrimaryGeneratedMetadata(Hospital, ['lat', 'lng'] as const),
   InputType,
 ) {}

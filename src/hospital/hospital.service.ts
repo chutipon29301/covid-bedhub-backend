@@ -35,10 +35,6 @@ export class HospitalService extends CrudService<Hospital> {
     queueAccessCode.userType = UserType.QUEUE_MANAGER;
     const hospital = await this.create({
       ...body,
-      location: {
-        type: 'Point',
-        coordinates: [body.lat, body.lng],
-      },
     });
     staffAccessCode.hospitalId = hospital.id;
     queueAccessCode.hospitalId = hospital.id;

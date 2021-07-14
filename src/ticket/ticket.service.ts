@@ -53,7 +53,6 @@ export class TicketService extends CrudService<Ticket> {
     const ticket = await super.create({
       ...data,
       riskLevel,
-      location: { type: 'Point', coordinates: [data.lat, data.lng] },
     });
     const vaccines: Vaccine[] = [];
     for (const vaccine of data.vaccines) {
