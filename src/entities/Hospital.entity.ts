@@ -33,13 +33,20 @@ export class Hospital extends PrimaryGeneratedEntity {
   @Column()
   tel: string;
 
-  @Field(() => PointObjectType)
-  @Column({
-    type: 'geography',
-    spatialFeatureType: 'Point',
-    srid: 4326,
-  })
-  location: Point;
+  @Field()
+  @Column('float')
+  lat: number;
+
+  @Field()
+  @Column('float')
+  lng: number;
+  // @Field(() => PointObjectType)
+  // @Column({
+  //   type: 'geography',
+  //   spatialFeatureType: 'Point',
+  //   srid: 4326,
+  // })
+  // location: Point;
 
   @OneToMany(() => AccessCode, o => o.hospital)
   accessCodes?: AccessCode[];

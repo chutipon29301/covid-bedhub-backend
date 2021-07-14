@@ -12,12 +12,15 @@ define(Ticket, () => {
   ticket.appointedDate = formatISO(date.future(1), { representation: 'date' });
   ticket.notes = lorem.sentence();
   ticket.riskLevel = datatype.number(3) + 1;
-  ticket.location = {
-    type: 'Point',
-    coordinates: [
-      +address.latitude(14.027042515728189, 13.601417374036716, 16),
-      +address.longitude(100.71115049015863, 100.37588622565592, 16),
-    ],
-  };
+  ticket.lat = +address.latitude(14.027042515728189, 13.601417374036716, 16);
+  ticket.lng = +address.longitude(100.71115049015863, 100.37588622565592, 16);
+
+  // ticket.location = {
+  //   type: 'Point',
+  //   coordinates: [
+  //     +address.latitude(14.027042515728189, 13.601417374036716, 16),
+  //     +address.longitude(100.71115049015863, 100.37588622565592, 16),
+  //   ],
+  // };
   return ticket;
 });
