@@ -78,13 +78,13 @@ export class Ticket extends PrimaryGeneratedEntity {
   @Column('int')
   riskLevel: number;
 
-  @Field(() => PointObjectType)
-  @Column({
-    type: 'geography',
-    spatialFeatureType: 'Point',
-    srid: 4326,
-  })
-  location: Point;
+  @Field()
+  @Column('float')
+  lat: number;
+
+  @Field()
+  @Column('float')
+  lng: number;
 
   @Field()
   @Column({
