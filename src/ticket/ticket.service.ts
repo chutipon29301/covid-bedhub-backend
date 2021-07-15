@@ -24,7 +24,7 @@ export class TicketService extends CrudService<Ticket> {
     const tickets = await this.repo
       .createQueryBuilder('ticket')
       .where(
-        `(ticket.location<@>point(:lat,:lng))*1.609344 < 5+30*LEAST(48,EXTRACT(EPOCH FROM current_timestamp-ticket."createdAt")/3600)`,
+        `(ticket.location<@>point(:lat,:lng))*1.609344 < 5+30*SQRT(LEAST(48,EXTRACT(EPOCH FROM current_timestamp-ticket."createdAt")/3600))`,
         { lat, lng },
       )
       .andWhere(`ticket.status = :status`, { status: TicketStatus.REQUEST })

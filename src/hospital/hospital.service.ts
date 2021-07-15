@@ -65,4 +65,13 @@ export class HospitalService extends CrudService<Hospital> {
       }
     }
   }
+
+  async checkAccessCodeValid(accessCode: string): Promise<Hospital> {
+    const validCode = await this.accessCodeRepo.findOne({ where: { accessCode } });
+    if (!validCode) {
+      throw new NotFoundException('Access code not found');
+    }
+    const hospital = await this.repo.findOne({ where: { id: validCode.hospitalId } });
+    return hospital;
+  }
 }

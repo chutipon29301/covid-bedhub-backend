@@ -1,7 +1,7 @@
-import { Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { AccessCode, Hospital } from '@entity';
 import { HospitalService } from './hospital.service';
-import { DataArgs, GqlUserToken, IdArgs, NullableQuery, Roles } from '@decorator';
+import { AllowUnauthenticated, DataArgs, GqlUserToken, IdArgs, NullableQuery, Roles } from '@decorator';
 import { JwtPayload } from '../jwt-auth/dto/jwt-auth.dto';
 import { EditHospitalDto, UpdateAccessCodeDto } from './dto/hospital.dto';
 
@@ -33,6 +33,12 @@ export class HospitalResolver {
     return this.service.updateCode(user.id, data.userType, data.accessCode);
   }
 
+  @AllowUnauthenticated
+  @Query(() => Hospital)
+  checkAccessCode(@Args('access_code') accessCode: string): Promise<Hospital> {
+    return this.service.checkAccessCodeValid(accessCode);
+  }
+
   @Roles('super_admin')
   @Mutation(() => Hospital)
   editHospital(@IdArgs() id: number, @DataArgs() data: EditHospitalDto): Promise<Hospital> {
@@ -41,7 +47,7 @@ export class HospitalResolver {
 
   @Roles('super_admin', 'code_generator')
   @ResolveField(() => [AccessCode])
-  accessesCodes(@Parent() hospital: Hospital): Promise<AccessCode[]> {
+  accessCodes(@Parent() hospital: Hospital): Promise<AccessCode[]> {
     return this.service.findAccessCode.load(hospital.id);
   }
 }
