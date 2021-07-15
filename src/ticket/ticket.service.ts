@@ -1,10 +1,9 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Vaccine, Symptom, Ticket, TicketStatus, Officer, Patient } from '@entity';
-import { FindConditions, In, Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { CrudService } from '../libs/crud.service';
-import { CreateTicketDto, EditTicketDto } from './dto/ticket.dto';
-// import { CreateTicketDto } from './dto/create-ticket.dto';
+import { AcceptTicketDto, CreateTicketDto, EditSymptomDto } from './dto/ticket.dto';
 
 @Injectable()
 export class TicketService extends CrudService<Ticket> {
@@ -17,28 +16,6 @@ export class TicketService extends CrudService<Ticket> {
     super(repo);
   }
 
-  // async checkTicketBelongToRequester(userId: number, patientId): Promise<boolean> {
-  //   const patient = await this.patientRepo.findOne({ id: patientId, reporterId: userId });
-  //   return patient != null;
-  // }
-
-  // async listAllTicketsOfReporter(reporterId: number): Promise<Ticket[]> {
-  //   const tickets = await this.repo
-  //     .createQueryBuilder('ticket')
-  //     .innerJoinAndSelect('ticket.patient', 'patient')
-  //     .where('patient.reporterId = :reporterId', { reporterId })
-  //     .getMany();
-  //   return tickets;
-  // }
-
-  // async listAllHospitalTickets(userId: number, ticketStatus: TicketStatus): Promise<Ticket[]> {
-  //   const officer = await this.officerRepo.findOne({ id: userId });
-  //   if (officer && ticketStatus) {
-  //     return await this.repo.find({ where: { hospitalId: officer.hospitalId, status: ticketStatus } });
-  //   }
-  //   return await this.repo.find({ where: { hospitalId: officer.hospitalId, relation: ['patient'] } });
-  // }
-
   async listRequestTicket(userId: number): Promise<Ticket[]> {
     const officer = await this.officerRepo.findOne(userId, {
       relations: ['hospital'],
@@ -47,7 +24,7 @@ export class TicketService extends CrudService<Ticket> {
     const tickets = await this.repo
       .createQueryBuilder('ticket')
       .where(
-        `(ticket.location<@>point(:lat,:lng))*1.609344 < 5+30* LEAST(48,EXTRACT(EPOCH FROM current_timestamp-ticket."createdAt")/3600)`,
+        `(ticket.location<@>point(:lat,:lng))*1.609344 < 5+30*LEAST(48,EXTRACT(EPOCH FROM current_timestamp-ticket."createdAt")/3600)`,
         { lat, lng },
       )
       .andWhere(`ticket.status = :status`, { status: TicketStatus.REQUEST })
@@ -55,6 +32,23 @@ export class TicketService extends CrudService<Ticket> {
       .addOrderBy('ticket."createdAt"', 'ASC')
       .getMany();
     return tickets;
+  }
+
+  async findTicketByNationalId(userId: number, nid: string): Promise<Ticket> {
+    const officer = await this.officerRepo.findOne({ id: userId });
+    const patient = await this.patientRepo.findOne({ where: { identification: nid } });
+    const appointmentTicket = await this.repo.findOne({
+      where: {
+        hospitalId: officer.hospitalId,
+        patientId: patient.id,
+        status: TicketStatus.MATCH,
+      },
+      order: { id: 'DESC' },
+    });
+    if (!appointmentTicket) {
+      throw new BadRequestException('Ticket not found');
+    }
+    return appointmentTicket;
   }
 
   async create(data: CreateTicketDto): Promise<Ticket> {
@@ -80,10 +74,76 @@ export class TicketService extends CrudService<Ticket> {
     return ticket;
   }
 
-  async updateTicket(conditions: FindConditions<Ticket>, dto: EditTicketDto): Promise<Ticket> {
-    const ticket = await super.updateOne(conditions, dto);
+  async updateSymptom(id: number, reporterId: number, data: EditSymptomDto): Promise<Ticket> {
+    const ticket = await this.findOne({
+      where: {
+        id,
+        patient: { reporterId },
+      },
+      relations: ['patient'],
+    });
+    if (!ticket) {
+      throw new BadRequestException('Ticket not exist');
+    }
+    if (![TicketStatus.REQUEST, TicketStatus.MATCH].includes(ticket.status)) {
+      throw new BadRequestException('Ticket cannot be edit');
+    }
     const riskLevel = await this.calculateRiskLevel(ticket.patientId, ticket.symptoms);
-    return super.updateOne(conditions, { riskLevel });
+    return this.updateOne({ id }, { symptoms: data.symptoms, riskLevel });
+  }
+
+  async reporterCancelTicket(id: number, reporterId: number): Promise<Ticket> {
+    const ticket = await this.findOne({
+      where: {
+        id,
+        patient: { reporterId },
+      },
+      relations: ['patient'],
+    });
+    if (!ticket) {
+      throw new BadRequestException('Ticket not exist');
+    }
+    return this.updateOne({ id }, { status: TicketStatus.PATIENT_CANCEL });
+  }
+
+  async acceptTicket(officerId: number, data: AcceptTicketDto): Promise<Ticket> {
+    const ticket = await this.findOne(data.id);
+    if (!ticket) {
+      throw new BadRequestException('Ticket not exist');
+    }
+    if (ticket.status !== TicketStatus.REQUEST) {
+      throw new BadRequestException('Cannot accept this ticket');
+    }
+    const officer = await this.officerRepo.findOne(officerId);
+    if (!officer) {
+      throw new BadRequestException('Officer not exist');
+    }
+    ticket.status = TicketStatus.MATCH;
+    ticket.updatedById = officerId;
+    ticket.hospitalId = officer.hospitalId;
+    ticket.appointedDate = data.appointedDate;
+    return this.repo.save(ticket);
+  }
+
+  async cancelAppointment(id: number, officerId: number): Promise<Ticket> {
+    const officer = await this.officerRepo.findOne(officerId);
+    if (!officer) {
+      throw new BadRequestException('Officer not exist');
+    }
+    const ticket = await this.findOne({
+      where: { id, hospitalId: officer.hospitalId },
+    });
+    if (!ticket) {
+      throw new BadRequestException('Ticket not exist');
+    }
+    if (ticket.status !== TicketStatus.MATCH) {
+      throw new BadRequestException('Cannot cancel this ticket appointment');
+    }
+    ticket.status = TicketStatus.REQUEST;
+    ticket.updatedById = null;
+    ticket.hospitalId = null;
+    ticket.appointedDate = null;
+    return this.repo.save(ticket);
   }
 
   private async calculateRiskLevel(patientId: number, symptoms: Symptom[]): Promise<number> {
