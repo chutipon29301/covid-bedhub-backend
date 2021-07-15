@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Vaccine, Symptom, Ticket, TicketStatus, Officer, Patient } from '@entity';
 import { FindConditions, In, Repository } from 'typeorm';
@@ -38,6 +38,24 @@ export class TicketService extends CrudService<Ticket> {
   //   }
   //   return await this.repo.find({ where: { hospitalId: officer.hospitalId, relation: ['patient'] } });
   // }
+
+  async listRequestTicket(userId: number): Promise<Ticket[]> {
+    const officer = await this.officerRepo.findOne(userId, {
+      relations: ['hospital'],
+    });
+    const { x: lat, y: lng } = officer.hospital.location;
+    const tickets = await this.repo
+      .createQueryBuilder('ticket')
+      .where(
+        `(ticket.location<@>point(:lat,:lng))*1.609344 < 5+30* LEAST(48,EXTRACT(EPOCH FROM current_timestamp-ticket."createdAt")/3600)`,
+        { lat, lng },
+      )
+      .andWhere(`ticket.status = :status`, { status: TicketStatus.REQUEST })
+      .orderBy('ticket.riskLevel', 'DESC')
+      .addOrderBy('ticket."createdAt"', 'ASC')
+      .getMany();
+    return tickets;
+  }
 
   async create(data: CreateTicketDto): Promise<Ticket> {
     const existingTicket = await this.repo.findOne({

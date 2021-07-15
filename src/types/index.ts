@@ -1,9 +1,10 @@
 import { ConfigService as NestConfigService } from '@nestjs/config';
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { Env } from '../config';
 
 export class ConfigService extends NestConfigService<Env> {}
 
+@InputType('PointInput')
 @ObjectType()
 export class Point {
   @Field()

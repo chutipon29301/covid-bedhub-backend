@@ -1,4 +1,4 @@
-import { Controller, Get, NotFoundException, Param } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 
 import { AccessCode } from '@entity';
 import { AllowUnauthenticated, UserToken, Roles } from '@decorator';

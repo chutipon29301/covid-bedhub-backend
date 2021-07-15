@@ -86,6 +86,7 @@ export class Ticket extends PrimaryGeneratedEntity {
     },
   })
   location: Point;
+
   @Field()
   @Column({
     nullable: true,

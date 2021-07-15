@@ -4,7 +4,6 @@ import { TicketService } from './ticket.service';
 import { DataArgs, GqlUserToken, IdArgs, NullableQuery, Roles } from '@decorator';
 import { CreateTicketDto, EditTicketDto } from './dto/ticket.dto';
 import { JwtPayload } from '../jwt-auth/dto/jwt-auth.dto';
-import { BadRequestException } from '@nestjs/common';
 
 @Resolver(() => Ticket)
 export class TicketResolver {
@@ -20,6 +19,12 @@ export class TicketResolver {
   @NullableQuery(() => Ticket)
   ticket(@IdArgs() id: number): Promise<Ticket> {
     return this.service.findOne(id);
+  }
+
+  @Roles('queue_manager')
+  @Query(() => [Ticket])
+  requestedTicket(@GqlUserToken() userToken: JwtPayload): Promise<Ticket[]> {
+    return this.service.listRequestTicket(userToken.id);
   }
 
   @Roles('reporter')
