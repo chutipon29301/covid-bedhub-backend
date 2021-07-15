@@ -1,10 +1,8 @@
 import { Column, Entity, OneToMany } from 'typeorm';
 import { Field, ObjectType } from '@nestjs/graphql';
-import { Point } from 'geojson';
 
 import { AccessCode, Officer, Ticket } from '.';
 import { PrimaryGeneratedEntity } from './PrimaryGenerated.abstract';
-import { PointObjectType } from '../types';
 
 @ObjectType()
 @Entity()

@@ -1,7 +1,5 @@
 import { Field, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
-import { Point } from 'geojson';
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
-import { PointObjectType } from '../types';
 import { Hospital } from './Hospital.entity';
 import { Officer } from './Officer.entity';
 import { Patient } from './Patient.entity';
