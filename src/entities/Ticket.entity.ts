@@ -1,7 +1,6 @@
 import { Field, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
-import { Point } from 'geojson';
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
-import { PointObjectType } from '../types';
+import { Point } from '../types';
 import { Hospital } from './Hospital.entity';
 import { Officer } from './Officer.entity';
 import { Patient } from './Patient.entity';
@@ -78,14 +77,15 @@ export class Ticket extends PrimaryGeneratedEntity {
   @Column('int')
   riskLevel: number;
 
-  @Field()
-  @Column('float')
-  lat: number;
-
-  @Field()
-  @Column('float')
-  lng: number;
-
+  @Field(() => Point)
+  @Column({
+    type: 'point',
+    transformer: {
+      from: v => v,
+      to: v => `${v.x},${v.y}`,
+    },
+  })
+  location: Point;
   @Field()
   @Column({
     nullable: true,

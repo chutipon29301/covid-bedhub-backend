@@ -1,10 +1,9 @@
 import { Column, Entity, OneToMany } from 'typeorm';
 import { Field, ObjectType } from '@nestjs/graphql';
-import { Point } from 'geojson';
 
 import { AccessCode, Officer, Ticket } from '.';
 import { PrimaryGeneratedEntity } from './PrimaryGenerated.abstract';
-import { PointObjectType } from '../types';
+import { Point } from '../types';
 
 @ObjectType()
 @Entity()
@@ -33,13 +32,15 @@ export class Hospital extends PrimaryGeneratedEntity {
   @Column()
   tel: string;
 
-  @Field()
-  @Column('float')
-  lat: number;
-
-  @Field()
-  @Column('float')
-  lng: number;
+  @Field(() => Point)
+  @Column({
+    type: 'point',
+    transformer: {
+      from: v => v,
+      to: v => `${v.x},${v.y}`,
+    },
+  })
+  location: Point;
 
   @OneToMany(() => AccessCode, o => o.hospital)
   accessCodes?: AccessCode[];

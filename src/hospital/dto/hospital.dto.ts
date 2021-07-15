@@ -67,7 +67,4 @@ export class UpdateHospitalDto {
 export class UpdateAccessCodeDto extends PickType(AccessCode, ['accessCode', 'userType'] as const, InputType) {}
 
 @InputType()
-export class EditHospitalDto extends PartialType(
-  OmitPrimaryGeneratedMetadata(Hospital, ['lat', 'lng'] as const),
-  InputType,
-) {}
+export class EditHospitalDto extends PartialType(OmitPrimaryGeneratedMetadata(Hospital), InputType) {}
