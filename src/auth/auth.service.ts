@@ -38,7 +38,6 @@ export class AuthService {
       return this.jwtAuthService.sign({
         id: profile.id,
         accountType: 'reporter',
-        hasProfile: !!profile.patients,
       });
     } else {
       throw new UnauthorizedException('Invalid line token');
