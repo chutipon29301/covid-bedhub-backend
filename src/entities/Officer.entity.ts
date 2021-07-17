@@ -17,8 +17,7 @@ export class Officer extends PrimaryGeneratedEntity {
   @Column({ unique: true })
   username: string;
 
-  @Field()
-  @Column()
+  @Column({ select: false })
   password: string;
 
   @Field()
