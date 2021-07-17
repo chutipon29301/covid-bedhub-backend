@@ -1,19 +1,49 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Vaccine, Symptom, Ticket, TicketStatus, Officer, Patient } from '@entity';
+import * as DataLoader from 'dataloader';
+import { Vaccine, Symptom, Ticket, TicketStatus, Officer, Patient, Hospital } from '@entity';
 import { In, Repository } from 'typeorm';
 import { CrudService } from '../libs/crud.service';
 import { AcceptTicketDto, CreateTicketDto, EditSymptomDto } from './dto/ticket.dto';
 
 @Injectable()
 export class TicketService extends CrudService<Ticket> {
+  readonly findHospital: DataLoader<number, Hospital>;
+  readonly findPatient: DataLoader<number, Patient>;
+  readonly findVaccines: DataLoader<number, Vaccine[]>;
+
   constructor(
     @InjectRepository(Patient) private readonly patientRepo: Repository<Patient>,
     @InjectRepository(Officer) private readonly officerRepo: Repository<Officer>,
     @InjectRepository(Vaccine) private readonly vaccineRepo: Repository<Vaccine>,
+    @InjectRepository(Hospital) private readonly hospitalRepo: Repository<Hospital>,
     @InjectRepository(Ticket) repo: Repository<Ticket>,
   ) {
     super(repo);
+
+    this.findHospital = new DataLoader<number, Hospital>(async ids => {
+      const hospitals = await this.hospitalRepo.findByIds([...ids]);
+      return ids.map(id => hospitals.find(o => o.id === id) || null);
+    });
+
+    this.findPatient = new DataLoader<number, Patient>(async ids => {
+      const patients = await this.patientRepo.findByIds([...ids]);
+      return ids.map(id => patients.find(o => o.id === id) || null);
+    });
+
+    this.findVaccines = new DataLoader<number, Vaccine[]>(async ids => {
+      const vaccines = await this.vaccineRepo.find({ where: { ticketId: In([...ids]) } });
+      return ids.map(id => vaccines.filter(o => o.id === id));
+    });
+  }
+
+  findReporterTicket(reporterId: number, ticketId: number): Promise<Ticket> {
+    return this.repo
+      .createQueryBuilder('ticket')
+      .leftJoin('ticket.patient', 'patient')
+      .where('ticket.id = :ticketId', { ticketId })
+      .andWhere('patient.reporterId = :reporterId', { reporterId })
+      .getOne();
   }
 
   async listRequestTicket(userId: number): Promise<Ticket[]> {
@@ -65,6 +95,10 @@ export class TicketService extends CrudService<Ticket> {
     const ticket = await super.create({
       ...data,
       riskLevel,
+      location: {
+        x: data.lat,
+        y: data.lng,
+      },
     });
     const vaccines: Vaccine[] = [];
     for (const vaccine of data.vaccines) {

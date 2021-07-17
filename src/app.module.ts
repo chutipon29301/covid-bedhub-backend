@@ -18,6 +18,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { PermissionsGuard } from './guard/permission.guard';
 import { PingModule } from './ping/ping.module';
 import { OfficerModule } from './officer/officer.module';
+import { ReporterModule } from './reporter/reporter.module';
 
 @Module({
   imports: [
@@ -53,6 +54,7 @@ import { OfficerModule } from './officer/officer.module';
     JwtAuthModule,
     PingModule,
     InviteModule,
+    ReporterModule,
   ],
   controllers: [HealthController],
   providers: [

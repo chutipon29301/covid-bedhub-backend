@@ -5,7 +5,6 @@ export type AccountType = 'reporter' | 'staff' | 'queue_manager' | 'code_generat
 export interface JwtPayload {
   id: number;
   accountType: AccountType;
-  hasProfile?: boolean;
 }
 
 @ObjectType()

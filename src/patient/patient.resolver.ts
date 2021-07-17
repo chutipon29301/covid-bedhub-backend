@@ -9,26 +9,17 @@ import { PatientService } from './patient.service';
 @Resolver()
 export class PatientResolver {
   constructor(private readonly service: PatientService) {}
-  @Roles('reporter')
-  @Query(() => [Patient])
-  patients(@GqlUserToken() user: JwtPayload): Promise<Patient[]> {
-    return this.service.findMany({ reporterId: user.id });
-  }
 
   @Roles('reporter')
   @Query(() => Patient)
   patient(@GqlUserToken() user: JwtPayload, @IdArgs() id: number): Promise<Patient> {
-    const patient = this.service.findOne({ where: { id, reporterId: user.id } });
-    if (!patient) {
-      throw new NotFoundException('User not found under reporters');
-    }
-    return patient;
+    return this.service.findOne({ where: { id, reporterId: user.id } });
   }
 
   @Roles('reporter')
   @Mutation(() => Patient)
   createPatient(@GqlUserToken() user: JwtPayload, @DataArgs() body: CreatePatientDto): Promise<Patient> {
-    return this.service.createPatient(user.id, body);
+    return this.service.create({ ...body, reporterId: user.id });
   }
 
   @Roles('reporter')

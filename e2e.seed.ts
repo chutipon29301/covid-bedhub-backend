@@ -25,20 +25,12 @@ export default class E2EApplicationSeeder implements Seeder {
     for (const reporter of reporters) {
       const generatePatient = await factory(Patient)().createMany(2, { reporterId: reporter.id });
       patients.push(...generatePatient);
-      const reporterRepo = connection.getRepository(Reporter);
-      await reporterRepo.update(
-        {
-          id: reporter.id,
-        },
-        {
-          defaultPatientId: generatePatient[0].id,
-        },
-      );
     }
 
     const tickets: Ticket[] = [];
     for (const patient of patients) {
-      tickets.push(await factory(Ticket)().create({ patientId: patient.id }));
+      const generatedTickets = await factory(Ticket)().createMany(3, { patientId: patient.id });
+      tickets.push(...generatedTickets);
     }
   }
 }

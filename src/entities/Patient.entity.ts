@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { PrimaryGeneratedEntity } from './PrimaryGenerated.abstract';
 import { Ticket } from './Ticket.entity';
 import { Reporter } from './Reporter.entity';
@@ -77,7 +77,4 @@ export class Patient extends PrimaryGeneratedEntity {
 
   @OneToMany(() => Ticket, o => o.patient)
   tickets?: Ticket[];
-
-  @OneToOne(() => Reporter, o => o.defaultPatient, { nullable: true })
-  defaultReporter?: Reporter;
 }
