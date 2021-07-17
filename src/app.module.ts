@@ -8,7 +8,6 @@ import { HealthController } from './health/health.controller';
 import { HospitalModule } from './hospital/hospital.module';
 import { PatientModule } from './patient/patient.module';
 import { TicketModule } from './ticket/ticket.module';
-import { UserModule } from './user/user.module';
 import { LineModule } from './line/line.module';
 import { AuthModule } from './auth/auth.module';
 import { InviteModule } from './invite/invite.module';
@@ -48,7 +47,6 @@ import { ReporterModule } from './reporter/reporter.module';
     PatientModule,
     OfficerModule,
     TicketModule,
-    UserModule,
     LineModule,
     AuthModule,
     JwtAuthModule,
