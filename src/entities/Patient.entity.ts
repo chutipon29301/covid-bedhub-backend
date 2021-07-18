@@ -51,7 +51,7 @@ export class Patient extends PrimaryGeneratedEntity {
     type: 'enum',
     enum: Illness,
     array: true,
-    nullable: true,
+    default: [],
   })
   illnesses?: Illness[];
 
