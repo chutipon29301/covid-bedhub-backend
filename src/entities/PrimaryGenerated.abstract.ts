@@ -1,5 +1,5 @@
 import { Type } from '@nestjs/common';
-import { Field, ID, ObjectType, OmitType } from '@nestjs/graphql';
+import { Field, ID, InputType, ObjectType, OmitType } from '@nestjs/graphql';
 import { CreateDateColumn, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 @ObjectType()
@@ -22,5 +22,5 @@ export function OmitPrimaryGeneratedMetadata<
   K extends keyof Omit<T, keyof PrimaryGeneratedEntity>,
 >(classRef: Type<T>, keys: readonly K[] = []) {
   const entityKeys: (keyof PrimaryGeneratedEntity)[] = ['id', 'createdAt', 'updatedAt'];
-  return OmitType(classRef, [...entityKeys, ...keys] as const);
+  return OmitType(classRef, [...entityKeys, ...keys] as const, InputType);
 }
