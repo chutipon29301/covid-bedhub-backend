@@ -40,22 +40,6 @@ export class Patient extends PrimaryGeneratedEntity {
 
   @Field()
   @Column()
-  subDistrict: string;
-
-  @Field()
-  @Column()
-  district: string;
-
-  @Field()
-  @Column()
-  province: string;
-
-  @Field()
-  @Column()
-  zipCode: string;
-
-  @Field()
-  @Column()
   tel: string;
 
   @Field()
