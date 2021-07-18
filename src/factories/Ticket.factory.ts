@@ -6,6 +6,7 @@ import { date, lorem, random, datatype, address } from 'faker';
 define(Ticket, () => {
   const ticket = new Ticket();
   ticket.examReceiveDate = formatISO(date.past(1), { representation: 'date' });
+  ticket.examLocation = address.cityName();
   ticket.examDate = formatISO(date.past(1, ticket.examReceiveDate), { representation: 'date' });
   ticket.symptoms = [random.arrayElement<Symptom>(Object.keys(Symptom) as Symptom[])];
   ticket.status = random.arrayElement<TicketStatus>(Object.keys(TicketStatus) as TicketStatus[]);

@@ -11,7 +11,7 @@ class CreateVaccine extends PickType(
 @InputType()
 export class CreateTicketDto extends PickType(
   Ticket,
-  ['patientId', 'examReceiveDate', 'examDate', 'symptoms'] as const,
+  ['patientId', 'examReceiveDate', 'examDate', 'symptoms', 'examLocation'] as const,
   InputType,
 ) {
   @Field(() => [CreateVaccine], { nullable: true })
