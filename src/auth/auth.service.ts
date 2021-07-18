@@ -1,6 +1,10 @@
-import { HttpService, Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, HttpService, Injectable, UnauthorizedException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { compare } from 'bcrypt';
 import { stringify } from 'qs';
-import { JwtTokenInfo } from '../jwt-auth/dto/jwt-auth.dto';
+import { Repository } from 'typeorm';
+import { Officer, OfficerRole } from '../entities';
+import { AccountType, JwtTokenInfo } from '../jwt-auth/dto/jwt-auth.dto';
 import { JwtAuthService } from '../jwt-auth/jwt-auth.service';
 import { LineService } from '../line/line.service';
 import { ConfigService } from '../types';
@@ -17,6 +21,7 @@ export class AuthService {
     private readonly httpService: HttpService,
     private readonly userService: UserService,
     private readonly jwtAuthService: JwtAuthService,
+    @InjectRepository(Officer) private readonly officerRepo: Repository<Officer>,
   ) {}
 
   getLineAuthenticationPageURL(): string {
@@ -41,6 +46,34 @@ export class AuthService {
       });
     } else {
       throw new UnauthorizedException('Invalid line token');
+    }
+  }
+
+  async getProfileJwtForOfficer(username: string, password: string): Promise<JwtTokenInfo> {
+    const officer = await this.officerRepo.findOne({ select: ['username', 'password', 'role'], where: { username } });
+    if (!officer) {
+      throw new BadRequestException('username or password is incorrect');
+    }
+    const compareResult = await compare(password, officer.password);
+    if (!compareResult) {
+      throw new BadRequestException('username or password is incorrect');
+    }
+    switch (officer.role) {
+      case OfficerRole.STAFF:
+        return this.jwtAuthService.sign({
+          id: officer.id,
+          accountType: 'staff',
+        });
+      case OfficerRole.CODE_GENERATOR:
+        return this.jwtAuthService.sign({
+          id: officer.id,
+          accountType: 'code_generator',
+        });
+      case OfficerRole.QUEUE_MANAGER:
+        return this.jwtAuthService.sign({
+          id: officer.id,
+          accountType: 'queue_manager',
+        });
     }
   }
 

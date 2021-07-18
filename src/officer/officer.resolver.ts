@@ -1,11 +1,9 @@
-import { UnauthorizedException } from '@nestjs/common';
-
-import { Officer } from '@entity';
-import { DataArgs, GqlUserToken, IdArgs, Roles } from '@decorator';
-import { UpdateOfficerDto } from './dto/officer.dto';
+import { Hospital, Officer } from '@entity';
+import { AllowUnauthenticated, DataArgs, GqlUserToken, Roles } from '@decorator';
+import { CreateOfficerDto, UpdateOfficerDto } from './dto/officer.dto';
 import { OfficerService } from './officer.service';
 import { JwtPayload } from '../jwt-auth/dto/jwt-auth.dto';
-import { Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 
 @Resolver(() => Officer)
 export class OfficerResolver {
@@ -13,22 +11,25 @@ export class OfficerResolver {
 
   @Roles('staff', 'code_generator', 'queue_manager')
   @Query(() => Officer)
-  officer(@GqlUserToken() user: JwtPayload, @IdArgs() id: number): Promise<Officer> {
-    if (user.id == id) {
-      return this.service.findOne({ id });
-    }
-    throw new UnauthorizedException('User not authorize to perform this action');
+  myOfficer(@GqlUserToken() user: JwtPayload): Promise<Officer> {
+    return this.service.findOne(user.id);
   }
+
+  @AllowUnauthenticated
+  @Mutation(() => Officer)
+  createOfficer(@DataArgs() body: CreateOfficerDto): Promise<Officer> {
+    return this.service.createOfficer(body);
+  }
+
   @Roles('staff', 'code_generator', 'queue_manager')
   @Mutation(() => Officer)
-  updateOfficer(
-    @GqlUserToken() user: JwtPayload,
-    @IdArgs() id: number,
-    @DataArgs() officer: UpdateOfficerDto,
-  ): Promise<Officer> {
-    if (user.id == id) {
-      return this.service.updateOne({ id }, officer);
-    }
-    throw new UnauthorizedException('User not authorize to perform this action');
+  updateMyOfficer(@GqlUserToken() user: JwtPayload, @DataArgs() officer: UpdateOfficerDto): Promise<Officer> {
+    return this.service.updateOne({ id: user.id }, officer);
+  }
+
+  @Roles('staff', 'code_generator', 'queue_manager')
+  @ResolveField(() => Hospital)
+  hospital(@Parent() officer: Officer): Promise<Hospital> {
+    return this.service.findHospital.load(officer.hospitalId);
   }
 }

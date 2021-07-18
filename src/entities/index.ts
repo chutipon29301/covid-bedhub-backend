@@ -5,3 +5,4 @@ export * from './Patient.entity';
 export * from './Reporter.entity';
 export * from './Ticket.entity';
 export * from './Vaccine.entity';
+export * from './PrimaryGenerated.abstract';

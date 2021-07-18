@@ -3,7 +3,7 @@ import { AccessCode, Hospital } from '@entity';
 import { HospitalService } from './hospital.service';
 import { AllowUnauthenticated, DataArgs, GqlUserToken, IdArgs, NullableQuery, Roles } from '@decorator';
 import { JwtPayload } from '../jwt-auth/dto/jwt-auth.dto';
-import { EditHospitalDto, UpdateAccessCodeDto } from './dto/hospital.dto';
+import { CreateHospitalDto, EditHospitalDto, UpdateAccessCodeDto } from './dto/hospital.dto';
 
 @Resolver(() => Hospital)
 export class HospitalResolver {
@@ -19,6 +19,12 @@ export class HospitalResolver {
   @NullableQuery(() => Hospital)
   hospital(@IdArgs() id: number): Promise<Hospital> {
     return this.service.findOne(id);
+  }
+
+  @Roles('super_admin')
+  @Mutation(() => Hospital)
+  createHospital(@DataArgs() data: CreateHospitalDto): Promise<Hospital> {
+    return this.service.create({ ...data, location: { x: data.lat, y: data.lng } });
   }
 
   @Roles('code_generator', 'queue_manager', 'reporter')

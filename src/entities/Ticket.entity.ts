@@ -44,6 +44,10 @@ export class Ticket extends PrimaryGeneratedEntity {
   @Column('date')
   examDate: string;
 
+  @Field()
+  @Column()
+  examLocation: string;
+
   @Field(() => [Symptom])
   @Column({
     type: 'enum',
@@ -60,7 +64,7 @@ export class Ticket extends PrimaryGeneratedEntity {
   })
   status: TicketStatus;
 
-  @Field()
+  @Field({ nullable: true })
   @Column({
     type: 'date',
     nullable: true,

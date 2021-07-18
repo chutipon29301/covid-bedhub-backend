@@ -17,9 +17,20 @@ export class Officer extends PrimaryGeneratedEntity {
   @Column({ unique: true })
   username: string;
 
+  @Column({ select: false })
+  password: string;
+
   @Field()
   @Column()
-  password: string;
+  firstName: string;
+
+  @Field()
+  @Column()
+  lastName: string;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  employeeId?: string;
 
   @Field()
   @Column({ type: 'enum', enum: OfficerRole })
