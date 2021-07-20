@@ -1,7 +1,7 @@
 import { Args, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { Hospital, Patient, Ticket, Vaccine } from '@entity';
 import { TicketService } from './ticket.service';
-import { DataArgs, GqlUserToken, IdArgs, NullableQuery, Roles, UserToken } from '@decorator';
+import { DataArgs, GqlUserToken, IdArgs, NullableQuery, Roles } from '@decorator';
 import { AcceptTicketDto, CreateTicketDto, EditSymptomDto } from './dto/ticket.dto';
 import { JwtPayload } from '../jwt-auth/dto/jwt-auth.dto';
 
@@ -35,7 +35,11 @@ export class TicketResolver {
 
   @Roles('reporter')
   @Mutation(() => Ticket)
-  editSymptom(@IdArgs() id: number, @UserToken() user: JwtPayload, @DataArgs() data: EditSymptomDto): Promise<Ticket> {
+  editSymptom(
+    @IdArgs() id: number,
+    @GqlUserToken() user: JwtPayload,
+    @DataArgs() data: EditSymptomDto,
+  ): Promise<Ticket> {
     return this.service.updateSymptom(id, user.id, data);
   }
 

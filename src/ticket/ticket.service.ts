@@ -109,13 +109,7 @@ export class TicketService extends CrudService<Ticket> {
   }
 
   async updateSymptom(id: number, reporterId: number, data: EditSymptomDto): Promise<Ticket> {
-    const ticket = await this.findOne({
-      where: {
-        id,
-        patient: { reporterId },
-      },
-      relations: ['patient'],
-    });
+    const ticket = await this.findReporterTicket(reporterId, id);
     if (!ticket) {
       throw new BadRequestException('Ticket not exist');
     }
@@ -127,13 +121,7 @@ export class TicketService extends CrudService<Ticket> {
   }
 
   async reporterCancelTicket(id: number, reporterId: number): Promise<Ticket> {
-    const ticket = await this.findOne({
-      where: {
-        id,
-        patient: { reporterId },
-      },
-      relations: ['patient'],
-    });
+    const ticket = await this.findReporterTicket(reporterId, id);
     if (!ticket) {
       throw new BadRequestException('Ticket not exist');
     }
