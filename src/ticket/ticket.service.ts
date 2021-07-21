@@ -182,7 +182,7 @@ export class TicketService extends CrudService<Ticket> {
       }
     }
     const patient = await this.patientRepo.findOne({ where: { id: patientId } });
-    if (patient.illnesses && patient.illnesses.length > 0 && riskLevel < risks.length) {
+    if (patient.illnesses && patient.illnesses.length > 0 && riskLevel == 1) {
       riskLevel += 1;
     }
     return riskLevel;
