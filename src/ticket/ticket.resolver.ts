@@ -2,7 +2,7 @@ import { Args, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/g
 import { Hospital, Patient, Ticket, Vaccine } from '@entity';
 import { TicketService } from './ticket.service';
 import { DataArgs, GqlUserToken, IdArgs, NullableQuery, Roles } from '@decorator';
-import { AcceptTicketDto, CreateTicketDto, EditSymptomDto } from './dto/ticket.dto';
+import { AcceptTicketDto, CreateTicketDto, EditAppointmentDto, EditSymptomDto } from './dto/ticket.dto';
 import { JwtPayload } from '../jwt-auth/dto/jwt-auth.dto';
 
 @Resolver(() => Ticket)
@@ -52,6 +52,12 @@ export class TicketResolver {
   @Roles('queue_manager')
   @Mutation(() => Ticket)
   acceptTicket(@GqlUserToken() userToken: JwtPayload, data: AcceptTicketDto): Promise<Ticket> {
+    return this.service.acceptTicket(userToken.id, data);
+  }
+
+  @Roles('queue_manager')
+  @Mutation(() => Ticket)
+  editAppointment(@GqlUserToken() userToken: JwtPayload, data: EditAppointmentDto): Promise<Ticket> {
     return this.service.acceptTicket(userToken.id, data);
   }
 

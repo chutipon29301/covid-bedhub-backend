@@ -29,3 +29,6 @@ export class EditSymptomDto extends PickType(Ticket, ['symptoms'] as const, Inpu
 
 @InputType()
 export class AcceptTicketDto extends PickType(Ticket, ['id', 'appointedDate', 'notes'] as const, InputType) {}
+
+@InputType()
+export class EditAppointmentDto extends PickType(Ticket, ['id', 'appointedDate', 'notes'] as const, InputType) {}
