@@ -1,0 +1,11 @@
+.github/*
+.vscode/*
+node_modules
+.env
+.eslintrc.js
+.prettierrc
+docker-compose.yaml
+e2e.seed.ts
+example.env
+nest-cli.json
+README.md
