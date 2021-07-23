@@ -1,4 +1,9 @@
+entryPoints:
+  web:
+    address: :80
 providers:
-  http:
-    endpoint:
-      - "http://127.0.0.1:3000"
+  file:
+    filename: ./backend.yaml
+api:
+  insecure: true
+  dashboard: true
