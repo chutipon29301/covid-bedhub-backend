@@ -4,7 +4,7 @@ entryPoints:
   websecure:
     address: :443
 certificatesResolvers:
-  myresolver:
+  letsencrypt:
     acme:
       email: chutiponh@hotmail.com
       storage: acme.json
