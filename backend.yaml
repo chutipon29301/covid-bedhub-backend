@@ -4,7 +4,7 @@ http:
       rule: 'Host(`api.thaibedhub.com`)'
       service: app
       tls: 
-        certResolver: myresolver
+        certResolver: letsencrypt
     https-to-app:
       rule: 'Host(`api.thaibedhub.com`)'
       service: app
