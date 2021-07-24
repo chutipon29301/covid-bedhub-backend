@@ -1,8 +1,10 @@
 http:
   routers:
     to-app:
-      rule: 'Host(`api.thaibedhub.com`)'
+      rule: 'Host(`api.thaibedhub.com`) && Path(`/graphql`) && Path(`/health`)'
       service: app
+      tls:
+        certResolver: myresolver
   services:
     app:
       loadBalancer:

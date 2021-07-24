@@ -1,6 +1,15 @@
 entryPoints:
   web:
     address: :80
+  websecure:
+    address: :443
+certificatesResolvers:
+  myresolver:
+    acme:
+      email: chutiponh@hotmail.com
+      storage: acme.json
+      httpChallenge:
+        entryPoint: web
 providers:
   file:
     filename: ./backend.yaml
