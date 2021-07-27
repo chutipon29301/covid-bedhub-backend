@@ -1,8 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { In, Repository } from 'typeorm';
 import * as DataLoader from 'dataloader';
 import { Vaccine, Symptom, Ticket, TicketStatus, Officer, Patient, Hospital } from '@entity';
-import { In, Repository } from 'typeorm';
 import { CrudService } from '../libs/crud.service';
 import { AcceptTicketDto, CreateTicketDto, EditSymptomDto } from './dto/ticket.dto';
 
@@ -69,6 +69,20 @@ export class TicketService extends CrudService<Ticket> {
       .take(take)
       .skip(skip)
       .getManyAndCount();
+  }
+
+  async listAcceptedTicket(
+    officerId: number,
+    take: number,
+    skip: number,
+    riskLevel?: number,
+  ): Promise<[Ticket[], number]> {
+    const { hospitalId } = await this.officerRepo.findOne(officerId);
+    return this.repo.findAndCount({
+      where: riskLevel ? { hospitalId, riskLevel } : { hospitalId },
+      take,
+      skip,
+    });
   }
 
   async findTicketByNationalId(userId: number, nid: string): Promise<Ticket> {

@@ -32,12 +32,15 @@ export class TicketResolver {
     return { tickets, count };
   }
 
-  // @Roles('queue_manager')
-  // @Query(() => TicketPaginationDto)
-  // async acceptedTicket(
-  //   @GqlUserToken() userToken: JwtPayload
-  // ): Promise<TicketPaginationDto> {
-  // }
+  @Roles('queue_manager')
+  @Query(() => TicketPaginationDto)
+  async acceptedTicket(
+    @GqlUserToken() userToken: JwtPayload,
+    @DataArgs({ nullable: true, defaultValue: { take: 15, skip: 0 } }) data: RequestTicketQueryDto,
+  ): Promise<TicketPaginationDto> {
+    const [tickets, count] = await this.service.listAcceptedTicket(userToken.id, data.take, data.skip, data.riskLevel);
+    return { tickets, count };
+  }
 
   @Roles('staff', 'queue_manager')
   @Query(() => Ticket)
