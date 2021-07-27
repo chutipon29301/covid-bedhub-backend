@@ -16,6 +16,18 @@ import { JwtPayload } from '../jwt-auth/dto/jwt-auth.dto';
 export class TicketResolver {
   constructor(private readonly service: TicketService) {}
 
+  @Roles('queue_manager')
+  @NullableQuery(() => Ticket)
+  requestedTicket(@GqlUserToken() userToken: JwtPayload, @IdArgs() id: number): Promise<Ticket> {
+    return this.service.findTicketForOfficer(userToken.id, id);
+  }
+
+  @Roles('queue_manager')
+  @NullableQuery(() => Ticket)
+  acceptedTicket(@GqlUserToken() userToken: JwtPayload, @IdArgs() id: number): Promise<Ticket> {
+    return this.service.findTicketForOfficer(userToken.id, id);
+  }
+
   @Roles('reporter')
   @NullableQuery(() => Ticket)
   myTicket(@GqlUserToken() userToken: JwtPayload, @IdArgs() id: number): Promise<Ticket> {
@@ -24,7 +36,7 @@ export class TicketResolver {
 
   @Roles('queue_manager')
   @Query(() => TicketPaginationDto)
-  async requestedTicket(
+  async requestedTickets(
     @GqlUserToken() userToken: JwtPayload,
     @DataArgs({ nullable: true, defaultValue: { take: 15, skip: 0 } }) data: RequestTicketQueryDto,
   ): Promise<TicketPaginationDto> {
@@ -34,7 +46,7 @@ export class TicketResolver {
 
   @Roles('queue_manager')
   @Query(() => TicketPaginationDto)
-  async acceptedTicket(
+  async acceptedTickets(
     @GqlUserToken() userToken: JwtPayload,
     @DataArgs({ nullable: true, defaultValue: { take: 15, skip: 0 } }) data: RequestTicketQueryDto,
   ): Promise<TicketPaginationDto> {

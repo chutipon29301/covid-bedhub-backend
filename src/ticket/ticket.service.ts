@@ -102,6 +102,11 @@ export class TicketService extends CrudService<Ticket> {
     return appointmentTicket;
   }
 
+  async findTicketForOfficer(officerId: number, ticketId: number): Promise<Ticket> {
+    const { hospitalId } = await this.officerRepo.findOne(officerId);
+    return this.repo.findOne({ hospitalId, id: ticketId });
+  }
+
   async create(data: CreateTicketDto): Promise<Ticket> {
     const existingTicket = await this.repo.findOne({
       where: {
