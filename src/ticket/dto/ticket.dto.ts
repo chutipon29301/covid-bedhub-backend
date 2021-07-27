@@ -1,4 +1,4 @@
-import { Field, InputType, PickType } from '@nestjs/graphql';
+import { Field, InputType, ObjectType, PickType } from '@nestjs/graphql';
 import { Ticket, Vaccine } from '@entity';
 
 @InputType()
@@ -32,3 +32,24 @@ export class AcceptTicketDto extends PickType(Ticket, ['id', 'appointedDate', 'n
 
 @InputType()
 export class EditAppointmentDto extends PickType(Ticket, ['id', 'appointedDate', 'notes'] as const, InputType) {}
+
+@InputType()
+export class RequestTicketQueryDto {
+  @Field({ defaultValue: 10 })
+  take: number;
+
+  @Field({ defaultValue: 0 })
+  skip: number;
+
+  @Field({ nullable: true })
+  riskLevel: number;
+}
+
+@ObjectType()
+export class TicketPaginationDto {
+  @Field(() => [Ticket])
+  tickets: Ticket[];
+
+  @Field()
+  count: number;
+}

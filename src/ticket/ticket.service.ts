@@ -46,22 +46,29 @@ export class TicketService extends CrudService<Ticket> {
       .getOne();
   }
 
-  async listRequestTicket(userId: number): Promise<Ticket[]> {
-    const officer = await this.officerRepo.findOne(userId, {
+  async listRequestTicket(
+    officerId: number,
+    take: number,
+    skip: number,
+    riskLevel?: number,
+  ): Promise<[Ticket[], number]> {
+    const officer = await this.officerRepo.findOne(officerId, {
       relations: ['hospital'],
     });
     const { x: lat, y: lng } = officer.hospital.location;
-    const tickets = await this.repo
+    return this.repo
       .createQueryBuilder('ticket')
       .where(
         `(ticket.location<@>point(:lat,:lng))*1.609344 < 5+30*SQRT(LEAST(48,EXTRACT(EPOCH FROM current_timestamp-ticket."createdAt")/3600))`,
         { lat, lng },
       )
       .andWhere(`ticket.status = :status`, { status: TicketStatus.REQUEST })
+      .andWhere(riskLevel ? `ticket.riskLevel = :riskLevel` : `1=1`, { riskLevel })
       .orderBy('ticket.riskLevel', 'DESC')
       .addOrderBy('ticket."createdAt"', 'ASC')
-      .getMany();
-    return tickets;
+      .take(take)
+      .skip(skip)
+      .getManyAndCount();
   }
 
   async findTicketByNationalId(userId: number, nid: string): Promise<Ticket> {

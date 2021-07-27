@@ -2,7 +2,14 @@ import { Args, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/g
 import { Hospital, Patient, Ticket, Vaccine } from '@entity';
 import { TicketService } from './ticket.service';
 import { DataArgs, GqlUserToken, IdArgs, NullableQuery, Roles } from '@decorator';
-import { AcceptTicketDto, CreateTicketDto, EditAppointmentDto, EditSymptomDto } from './dto/ticket.dto';
+import {
+  AcceptTicketDto,
+  CreateTicketDto,
+  EditAppointmentDto,
+  EditSymptomDto,
+  RequestTicketQueryDto,
+  TicketPaginationDto,
+} from './dto/ticket.dto';
 import { JwtPayload } from '../jwt-auth/dto/jwt-auth.dto';
 
 @Resolver(() => Ticket)
@@ -16,10 +23,21 @@ export class TicketResolver {
   }
 
   @Roles('queue_manager')
-  @Query(() => [Ticket])
-  requestedTicket(@GqlUserToken() userToken: JwtPayload): Promise<Ticket[]> {
-    return this.service.listRequestTicket(userToken.id);
+  @Query(() => TicketPaginationDto)
+  async requestedTicket(
+    @GqlUserToken() userToken: JwtPayload,
+    @DataArgs({ nullable: true, defaultValue: { take: 15, skip: 0 } }) data: RequestTicketQueryDto,
+  ): Promise<TicketPaginationDto> {
+    const [tickets, count] = await this.service.listRequestTicket(userToken.id, data.take, data.skip, data.riskLevel);
+    return { tickets, count };
   }
+
+  // @Roles('queue_manager')
+  // @Query(() => TicketPaginationDto)
+  // async acceptedTicket(
+  //   @GqlUserToken() userToken: JwtPayload
+  // ): Promise<TicketPaginationDto> {
+  // }
 
   @Roles('staff', 'queue_manager')
   @Query(() => Ticket)
