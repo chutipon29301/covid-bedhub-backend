@@ -67,7 +67,7 @@ export class TicketResolver {
     return this.service.cancelAppointment(id, userToken.id);
   }
 
-  @Roles('reporter')
+  @Roles('reporter', 'queue_manager')
   @ResolveField(() => Patient)
   patient(@Parent() ticket: Ticket): Promise<Patient> {
     return this.service.findPatient.load(ticket.patientId);

@@ -19,7 +19,7 @@ export class PermissionsGuard implements CanActivate {
     } else {
       request = context.switchToHttp().getRequest();
     }
-    if (!(process.env.NODE_ENV !== 'production' && request.authenticationType === 'development')) {
+    if (process.env.NODE_ENV === 'production' && request.authenticationType === 'development') {
       return false;
     }
     if (!request?.user) return false;
