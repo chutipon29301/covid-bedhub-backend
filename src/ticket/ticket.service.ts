@@ -4,7 +4,7 @@ import { In, Repository } from 'typeorm';
 import * as DataLoader from 'dataloader';
 import { Vaccine, Symptom, Ticket, TicketStatus, Officer, Patient, Hospital } from '@entity';
 import { CrudService } from '../libs/crud.service';
-import { AcceptTicketDto, CreateTicketDto, EditSymptomDto } from './dto/ticket.dto';
+import { AcceptTicketDto, CreateTicketDto, EditSymptomDto, TicketByRiskLevelCountDto } from './dto/ticket.dto';
 
 @Injectable()
 export class TicketService extends CrudService<Ticket> {
@@ -120,6 +120,33 @@ export class TicketService extends CrudService<Ticket> {
       .getCount();
     const acceptedCount = await this.repo.count({ hospitalId: officer.hospitalId });
     return [requestedCount, acceptedCount];
+  }
+
+  async requestedTicketByRiskLevelCount(officerId: number): Promise<TicketByRiskLevelCountDto[]> {
+    const officer = await this.officerRepo.findOne(officerId, { relations: ['hospital'] });
+    const { x: lat, y: lng } = officer.hospital.location;
+    return this.repo
+      .createQueryBuilder('ticket')
+      .select(`ticket.riskLevel`, 'riskLevel')
+      .addSelect(`COUNT(1)`, 'count')
+      .where(
+        `(ticket.location<@>point(:lat,:lng))*1.609344 < 5+30*SQRT(LEAST(48,EXTRACT(EPOCH FROM current_timestamp-ticket."createdAt")/3600))`,
+        { lat, lng },
+      )
+      .andWhere(`ticket.status = :status`, { status: TicketStatus.REQUEST })
+      .groupBy(`ticket.riskLevel`)
+      .getRawMany();
+  }
+
+  async acceptedTicketByRiskLevelCount(officerId: number): Promise<TicketByRiskLevelCountDto[]> {
+    const { hospitalId } = await this.officerRepo.findOne(officerId);
+    return this.repo
+      .createQueryBuilder('ticket')
+      .select('ticket.riskLevel', 'riskLevel')
+      .addSelect('COUNT(1)', 'count')
+      .where('ticket.hospitalId = :hospitalId', { hospitalId })
+      .groupBy('ticket.riskLevel')
+      .getRawMany();
   }
 
   async create(data: CreateTicketDto): Promise<Ticket> {

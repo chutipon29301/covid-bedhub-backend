@@ -1,4 +1,4 @@
-import { Args, Int, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { Hospital, Patient, Ticket, Vaccine } from '@entity';
 import { TicketService } from './ticket.service';
 import { DataArgs, GqlUserToken, IdArgs, NullableQuery, Roles } from '@decorator';
@@ -9,6 +9,7 @@ import {
   EditSymptomDto,
   RequestedAndAcceptedTicketCountDto,
   RequestTicketQueryDto,
+  TicketByRiskLevelCountDto,
   TicketPaginationDto,
 } from './dto/ticket.dto';
 import { JwtPayload } from '../jwt-auth/dto/jwt-auth.dto';
@@ -33,6 +34,18 @@ export class TicketResolver {
   @NullableQuery(() => Ticket)
   myTicket(@GqlUserToken() userToken: JwtPayload, @IdArgs() id: number): Promise<Ticket> {
     return this.service.findReporterTicket(userToken.id, id);
+  }
+
+  @Roles('queue_manager')
+  @Query(() => [TicketByRiskLevelCountDto])
+  async requestedTicketByRiskLevelCount(@GqlUserToken() userToken: JwtPayload): Promise<TicketByRiskLevelCountDto[]> {
+    return this.service.requestedTicketByRiskLevelCount(userToken.id);
+  }
+
+  @Roles('queue_manager')
+  @Query(() => [TicketByRiskLevelCountDto])
+  async acceptedTicketByRiskLevelCount(@GqlUserToken() userToken: JwtPayload): Promise<TicketByRiskLevelCountDto[]> {
+    return this.service.acceptedTicketByRiskLevelCount(userToken.id);
   }
 
   @Roles('queue_manager')

@@ -62,3 +62,12 @@ export class RequestedAndAcceptedTicketCountDto {
   @Field()
   acceptedCount: number;
 }
+
+@ObjectType()
+export class TicketByRiskLevelCountDto {
+  @Field()
+  riskLevel: number;
+
+  @Field()
+  count: number;
+}
