@@ -53,3 +53,12 @@ export class TicketPaginationDto {
   @Field()
   count: number;
 }
+
+@ObjectType()
+export class RequestedAndAcceptedTicketCountDto {
+  @Field()
+  requestedCount: number;
+
+  @Field()
+  acceptedCount: number;
+}

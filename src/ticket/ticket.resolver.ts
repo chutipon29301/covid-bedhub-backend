@@ -1,4 +1,4 @@
-import { Args, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
+import { Args, Int, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { Hospital, Patient, Ticket, Vaccine } from '@entity';
 import { TicketService } from './ticket.service';
 import { DataArgs, GqlUserToken, IdArgs, NullableQuery, Roles } from '@decorator';
@@ -7,6 +7,7 @@ import {
   CreateTicketDto,
   EditAppointmentDto,
   EditSymptomDto,
+  RequestedAndAcceptedTicketCountDto,
   RequestTicketQueryDto,
   TicketPaginationDto,
 } from './dto/ticket.dto';
@@ -32,6 +33,18 @@ export class TicketResolver {
   @NullableQuery(() => Ticket)
   myTicket(@GqlUserToken() userToken: JwtPayload, @IdArgs() id: number): Promise<Ticket> {
     return this.service.findReporterTicket(userToken.id, id);
+  }
+
+  @Roles('queue_manager')
+  @Query(() => RequestedAndAcceptedTicketCountDto)
+  async requestedAndAcceptedTicketsCount(
+    @GqlUserToken() userToken: JwtPayload,
+  ): Promise<RequestedAndAcceptedTicketCountDto> {
+    const [requestedCount, acceptedCount] = await this.service.requestedAndAcceptedTicketCount(userToken.id);
+    return {
+      requestedCount,
+      acceptedCount,
+    };
   }
 
   @Roles('queue_manager')

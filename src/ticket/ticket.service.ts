@@ -107,6 +107,21 @@ export class TicketService extends CrudService<Ticket> {
     return this.repo.findOne({ hospitalId, id: ticketId });
   }
 
+  async requestedAndAcceptedTicketCount(officerId: number): Promise<number[]> {
+    const officer = await this.officerRepo.findOne(officerId, { relations: ['hospital'] });
+    const { x: lat, y: lng } = officer.hospital.location;
+    const requestedCount = await this.repo
+      .createQueryBuilder('ticket')
+      .where(
+        `(ticket.location<@>point(:lat,:lng))*1.609344 < 5+30*SQRT(LEAST(48,EXTRACT(EPOCH FROM current_timestamp-ticket."createdAt")/3600))`,
+        { lat, lng },
+      )
+      .andWhere(`ticket.status = :status`, { status: TicketStatus.REQUEST })
+      .getCount();
+    const acceptedCount = await this.repo.count({ hospitalId: officer.hospitalId });
+    return [requestedCount, acceptedCount];
+  }
+
   async create(data: CreateTicketDto): Promise<Ticket> {
     const existingTicket = await this.repo.findOne({
       where: {
