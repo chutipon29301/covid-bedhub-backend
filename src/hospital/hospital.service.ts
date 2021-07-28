@@ -1,4 +1,4 @@
-import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { nanoid } from 'nanoid';
@@ -18,12 +18,15 @@ export class HospitalService extends CrudService<Hospital> {
   ) {
     super(repo);
 
-    this.findAccessCode = new DataLoader<number, AccessCode[]>(async hospitalIds => {
-      const accessCodes = await this.accessCodeRepo.find({
-        where: { hospitalId: In([...hospitalIds]) },
-      });
-      return hospitalIds.map(hospitalId => accessCodes.filter(o => o.hospitalId === hospitalId));
-    });
+    this.findAccessCode = new DataLoader<number, AccessCode[]>(
+      async hospitalIds => {
+        const accessCodes = await this.accessCodeRepo.find({
+          where: { hospitalId: In([...hospitalIds]) },
+        });
+        return hospitalIds.map(hospitalId => accessCodes.filter(o => o.hospitalId === hospitalId));
+      },
+      { cache: false },
+    );
   }
 
   async createOne(body: CreateHospitalDto): Promise<Hospital> {
@@ -47,23 +50,11 @@ export class HospitalService extends CrudService<Hospital> {
     return this.repo.findOne({ id: officer.hospitalId });
   }
 
-  async updateCode(userId: number, userType: UserType, newCode: string): Promise<Hospital> {
-    try {
-      const officer = await this.officerRepo.findOne({ id: userId });
-      const hospital = await this.repo.findOne({ id: officer.hospitalId });
-      if (hospital) {
-        const userCode = await this.accessCodeRepo.findOne({ hospitalId: hospital.id, userType });
-        userCode.accessCode = newCode;
-        await this.accessCodeRepo.update(userCode.id, userCode);
-        return hospital;
-      }
-    } catch (error) {
-      if (error instanceof HttpException) {
-        throw error;
-      } else {
-        throw new NotFoundException(error.message);
-      }
-    }
+  async updateCode(officerId: number, userType: UserType, newCode: string): Promise<AccessCode> {
+    const { hospitalId } = await this.officerRepo.findOne(officerId);
+    const accessCode = await this.accessCodeRepo.findOne({ where: { hospitalId, userType } });
+    accessCode.accessCode = newCode;
+    return this.accessCodeRepo.save(accessCode);
   }
 
   async checkAccessCodeValid(accessCode: string): Promise<Hospital> {
