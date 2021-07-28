@@ -11,6 +11,7 @@ import {
   RequestTicketQueryDto,
   TicketByRiskLevelCountDto,
   TicketPaginationDto,
+  TicketSortOption,
 } from './dto/ticket.dto';
 import { JwtPayload } from '../jwt-auth/dto/jwt-auth.dto';
 
@@ -20,8 +21,8 @@ export class TicketResolver {
 
   @Roles('queue_manager')
   @NullableQuery(() => Ticket)
-  requestedTicket(@GqlUserToken() userToken: JwtPayload, @IdArgs() id: number): Promise<Ticket> {
-    return this.service.findTicketForOfficer(userToken.id, id);
+  requestedTicket(@IdArgs() id: number): Promise<Ticket> {
+    return this.service.findOne(id);
   }
 
   @Roles('queue_manager')
@@ -65,8 +66,15 @@ export class TicketResolver {
   async requestedTickets(
     @GqlUserToken() userToken: JwtPayload,
     @DataArgs({ nullable: true, defaultValue: { take: 15, skip: 0 } }) data: RequestTicketQueryDto,
+    @Args('sortOptions', { nullable: true }) sortOption: TicketSortOption,
   ): Promise<TicketPaginationDto> {
-    const [tickets, count] = await this.service.listRequestTicket(userToken.id, data.take, data.skip, data.riskLevel);
+    const [tickets, count] = await this.service.listRequestTicket(
+      userToken.id,
+      data.take,
+      data.skip,
+      data.riskLevel,
+      sortOption,
+    );
     return { tickets, count };
   }
 
@@ -110,13 +118,13 @@ export class TicketResolver {
 
   @Roles('queue_manager')
   @Mutation(() => Ticket)
-  acceptTicket(@GqlUserToken() userToken: JwtPayload, data: AcceptTicketDto): Promise<Ticket> {
+  acceptTicket(@GqlUserToken() userToken: JwtPayload, @DataArgs() data: AcceptTicketDto): Promise<Ticket> {
     return this.service.acceptTicket(userToken.id, data);
   }
 
   @Roles('queue_manager')
   @Mutation(() => Ticket)
-  editAppointment(@GqlUserToken() userToken: JwtPayload, data: EditAppointmentDto): Promise<Ticket> {
+  editAppointment(@GqlUserToken() userToken: JwtPayload, @DataArgs() data: EditAppointmentDto): Promise<Ticket> {
     return this.service.acceptTicket(userToken.id, data);
   }
 
@@ -141,7 +149,7 @@ export class TicketResolver {
     return this.service.findHospital.load(ticket.hospitalId);
   }
 
-  @Roles('reporter')
+  @Roles('reporter', 'queue_manager')
   @ResolveField(() => [Vaccine])
   vaccines(@Parent() ticket: Ticket): Promise<Vaccine[]> {
     return this.service.findVaccines.load(ticket.id);

@@ -1,4 +1,4 @@
-import { Field, InputType, ObjectType, PickType } from '@nestjs/graphql';
+import { Field, InputType, ObjectType, PickType, registerEnumType } from '@nestjs/graphql';
 import { Ticket, Vaccine } from '@entity';
 
 @InputType()
@@ -70,4 +70,28 @@ export class TicketByRiskLevelCountDto {
 
   @Field()
   count: number;
+}
+
+export enum TicketSortableColumn {
+  CREATED_AT = 'CREATED_AT',
+  BIRTH_DATE = 'BIRTH_DATE',
+  RISK_LEVEL = 'RISK_LEVEL',
+}
+
+registerEnumType(TicketSortableColumn, { name: 'TicketSortableColumn' });
+
+export enum SortOption {
+  ASC = 'ASC',
+  DESC = 'DESC',
+}
+
+registerEnumType(SortOption, { name: 'SortOption' });
+
+@InputType()
+export class TicketSortOption {
+  @Field(() => TicketSortableColumn)
+  sortBy: TicketSortableColumn;
+
+  @Field(() => SortOption)
+  sortOption: SortOption;
 }

@@ -4,7 +4,15 @@ import { In, Repository } from 'typeorm';
 import * as DataLoader from 'dataloader';
 import { Vaccine, Symptom, Ticket, TicketStatus, Officer, Patient, Hospital } from '@entity';
 import { CrudService } from '../libs/crud.service';
-import { AcceptTicketDto, CreateTicketDto, EditSymptomDto, TicketByRiskLevelCountDto } from './dto/ticket.dto';
+import {
+  AcceptTicketDto,
+  CreateTicketDto,
+  EditSymptomDto,
+  SortOption,
+  TicketByRiskLevelCountDto,
+  TicketSortableColumn,
+  TicketSortOption,
+} from './dto/ticket.dto';
 
 @Injectable()
 export class TicketService extends CrudService<Ticket> {
@@ -51,24 +59,44 @@ export class TicketService extends CrudService<Ticket> {
     take: number,
     skip: number,
     riskLevel?: number,
+    sortOption?: TicketSortOption,
   ): Promise<[Ticket[], number]> {
     const officer = await this.officerRepo.findOne(officerId, {
       relations: ['hospital'],
     });
     const { x: lat, y: lng } = officer.hospital.location;
-    return this.repo
+    let query = this.repo
       .createQueryBuilder('ticket')
+      .leftJoinAndSelect('ticket.patient', 'patient')
       .where(
         `(ticket.location<@>point(:lat,:lng))*1.609344 < 5+30*SQRT(LEAST(48,EXTRACT(EPOCH FROM current_timestamp-ticket."createdAt")/3600))`,
         { lat, lng },
       )
       .andWhere(`ticket.status = :status`, { status: TicketStatus.REQUEST })
-      .andWhere(riskLevel ? `ticket.riskLevel = :riskLevel` : `1=1`, { riskLevel })
-      .orderBy('ticket.riskLevel', 'DESC')
-      .addOrderBy('ticket."createdAt"', 'ASC')
-      .take(take)
-      .skip(skip)
-      .getManyAndCount();
+      .andWhere(riskLevel ? `ticket.riskLevel = :riskLevel` : `1=1`, { riskLevel });
+    if (sortOption) {
+      switch (sortOption.sortBy) {
+        case TicketSortableColumn.RISK_LEVEL:
+          query = query.orderBy('ticket.riskLevel', sortOption.sortOption);
+          break;
+        case TicketSortableColumn.CREATED_AT:
+          query = query.orderBy('ticket.createdAt', sortOption.sortOption);
+          break;
+        case TicketSortableColumn.BIRTH_DATE:
+          switch (sortOption.sortOption) {
+            case SortOption.ASC:
+              query = query.orderBy('patient.birthDate', SortOption.DESC);
+              break;
+            case SortOption.DESC:
+              query = query.orderBy('patient.birthDate', SortOption.ASC);
+              break;
+          }
+          break;
+      }
+    } else {
+      query = query.orderBy('ticket.riskLevel', 'DESC').addOrderBy('ticket.createdAt', 'ASC');
+    }
+    return query.take(take).skip(skip).getManyAndCount();
   }
 
   async listAcceptedTicket(
