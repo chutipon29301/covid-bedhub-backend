@@ -69,7 +69,7 @@ export class TicketService extends CrudService<Ticket> {
       .createQueryBuilder('ticket')
       .leftJoinAndSelect('ticket.patient', 'patient')
       .where(
-        `(ticket.location<@>point(:lat,:lng))*1.609344 < 5+30*SQRT(LEAST(48,EXTRACT(EPOCH FROM current_timestamp-ticket."createdAt")/3600))`,
+        `(ticket.location<@>point(:lat,:lng))*1.609344 <= 5+30*SQRT(LEAST(48,EXTRACT(EPOCH FROM current_timestamp-ticket."createdAt")/3600))`,
         { lat, lng },
       )
       .andWhere(`ticket.status = :status`, { status: TicketStatus.REQUEST })
@@ -104,13 +104,37 @@ export class TicketService extends CrudService<Ticket> {
     take: number,
     skip: number,
     riskLevel?: number,
+    sortOption?: TicketSortOption,
   ): Promise<[Ticket[], number]> {
     const { hospitalId } = await this.officerRepo.findOne(officerId);
-    return this.repo.findAndCount({
-      where: riskLevel ? { hospitalId, riskLevel } : { hospitalId },
-      take,
-      skip,
-    });
+    let query = this.repo
+      .createQueryBuilder('ticket')
+      .leftJoinAndSelect('ticket.patient', 'patient')
+      .where('ticket.hospitalId = :hospitalId', { hospitalId })
+      .andWhere(riskLevel ? `ticket.riskLevel = :riskLevel` : `1=1`, { riskLevel });
+    if (sortOption) {
+      switch (sortOption.sortBy) {
+        case TicketSortableColumn.RISK_LEVEL:
+          query = query.orderBy('ticket.riskLevel', sortOption.sortOption);
+          break;
+        case TicketSortableColumn.CREATED_AT:
+          query = query.orderBy('ticket.createdAt', sortOption.sortOption);
+          break;
+        case TicketSortableColumn.BIRTH_DATE:
+          switch (sortOption.sortOption) {
+            case SortOption.ASC:
+              query = query.orderBy('patient.birthDate', SortOption.DESC);
+              break;
+            case SortOption.DESC:
+              query = query.orderBy('patient.birthDate', SortOption.ASC);
+              break;
+          }
+          break;
+      }
+    } else {
+      query = query.orderBy('ticket.riskLevel', 'DESC').addOrderBy('ticket.createdAt', 'ASC');
+    }
+    return query.take(take).skip(skip).getManyAndCount();
   }
 
   async findTicketByNationalId(userId: number, nid: string): Promise<Ticket> {

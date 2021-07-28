@@ -83,8 +83,15 @@ export class TicketResolver {
   async acceptedTickets(
     @GqlUserToken() userToken: JwtPayload,
     @DataArgs({ nullable: true, defaultValue: { take: 15, skip: 0 } }) data: RequestTicketQueryDto,
+    @Args('sortOptions', { nullable: true }) sortOption: TicketSortOption,
   ): Promise<TicketPaginationDto> {
-    const [tickets, count] = await this.service.listAcceptedTicket(userToken.id, data.take, data.skip, data.riskLevel);
+    const [tickets, count] = await this.service.listAcceptedTicket(
+      userToken.id,
+      data.take,
+      data.skip,
+      data.riskLevel,
+      sortOption,
+    );
     return { tickets, count };
   }
 
