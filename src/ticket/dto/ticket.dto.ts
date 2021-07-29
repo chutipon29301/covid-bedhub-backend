@@ -1,5 +1,5 @@
 import { Field, InputType, ObjectType, PickType, registerEnumType } from '@nestjs/graphql';
-import { Ticket, Vaccine } from '@entity';
+import { Hospital, Ticket, Vaccine } from '@entity';
 
 @InputType()
 class CreateVaccine extends PickType(
@@ -94,4 +94,13 @@ export class TicketSortOption {
 
   @Field(() => SortOption)
   sortOption: SortOption;
+}
+
+@ObjectType()
+export class AppointmentInfoDto {
+  @Field(() => Ticket, { nullable: true })
+  ticket: Ticket;
+
+  @Field(() => Hospital, { nullable: true })
+  hospital: Hospital;
 }

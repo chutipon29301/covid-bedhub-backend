@@ -4,6 +4,7 @@ import { TicketService } from './ticket.service';
 import { DataArgs, GqlUserToken, IdArgs, NullableQuery, Roles } from '@decorator';
 import {
   AcceptTicketDto,
+  AppointmentInfoDto,
   CreateTicketDto,
   EditAppointmentDto,
   EditSymptomDto,
@@ -96,8 +97,8 @@ export class TicketResolver {
   }
 
   @Roles('staff', 'queue_manager')
-  @Query(() => Ticket)
-  ticketByNationalId(@GqlUserToken() userToken: JwtPayload, @Args('nid') nid: string): Promise<Ticket> {
+  @Query(() => AppointmentInfoDto)
+  ticketByNationalId(@GqlUserToken() userToken: JwtPayload, @Args('nid') nid: string): Promise<AppointmentInfoDto> {
     return this.service.findTicketByNationalId(userToken.id, nid);
   }
 
