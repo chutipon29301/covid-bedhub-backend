@@ -39,12 +39,6 @@ export class HospitalResolver {
     return this.service.updateCode(userToken.id, data.userType, data.accessCode);
   }
 
-  @AllowUnauthenticated
-  @Query(() => Hospital)
-  checkAccessCode(@Args('access_code') accessCode: string): Promise<Hospital> {
-    return this.service.checkAccessCodeValid(accessCode);
-  }
-
   @Roles('super_admin')
   @Mutation(() => Hospital)
   editHospital(@IdArgs() id: number, @DataArgs() data: EditHospitalDto): Promise<Hospital> {

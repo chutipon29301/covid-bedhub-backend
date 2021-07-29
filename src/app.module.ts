@@ -19,6 +19,7 @@ import { PermissionsGuard } from './guard/permission.guard';
 import { PingModule } from './ping/ping.module';
 import { OfficerModule } from './officer/officer.module';
 import { ReporterModule } from './reporter/reporter.module';
+import { AccessCodeModule } from './access-code/access-code.module';
 
 @Module({
   imports: [
@@ -55,6 +56,7 @@ import { ReporterModule } from './reporter/reporter.module';
     PingModule,
     InviteModule,
     ReporterModule,
+    AccessCodeModule,
   ],
   controllers: [HealthController],
   providers: [

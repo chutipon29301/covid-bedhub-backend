@@ -141,13 +141,13 @@ export class TicketResolver {
     return this.service.cancelAppointment(id, userToken.id);
   }
 
-  @Roles('reporter', 'queue_manager')
+  @Roles('reporter', 'queue_manager', 'staff')
   @ResolveField(() => Patient)
   patient(@Parent() ticket: Ticket): Promise<Patient> {
     return this.service.findPatient.load(ticket.patientId);
   }
 
-  @Roles('reporter')
+  @Roles('reporter', 'staff')
   @ResolveField(() => Hospital, { nullable: true })
   hospital(@Parent() ticket: Ticket): Promise<Hospital> {
     if (!ticket.hospitalId) {

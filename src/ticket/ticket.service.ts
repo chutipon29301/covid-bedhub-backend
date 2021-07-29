@@ -265,6 +265,7 @@ export class TicketService extends CrudService<Ticket> {
     ticket.updatedById = officerId;
     ticket.hospitalId = officer.hospitalId;
     ticket.appointedDate = data.appointedDate;
+    ticket.notes = data.notes;
     return this.repo.save(ticket);
   }
 
