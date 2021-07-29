@@ -325,6 +325,9 @@ export class TicketService extends CrudService<Ticket> {
   }
 
   private async calculateRiskLevel(patientId: number, symptoms: Symptom[]): Promise<number> {
+    if (symptoms.length === 0) {
+      throw new BadRequestException('No symptoms selected');
+    }
     let riskLevel = 0;
     const risk1 = [Symptom.FEVER, Symptom.COUGH, Symptom.SMELLESS_RASH];
     const risk2 = [Symptom.DIARRHEA, Symptom.TIRED_HEADACHE, Symptom.DIFFICULT_BREATHING, Symptom.ANGINA];
@@ -336,9 +339,6 @@ export class TicketService extends CrudService<Ticket> {
         riskLevel = risks.length - index;
         break;
       }
-    }
-    if (riskLevel === 0) {
-      throw new BadRequestException('No symptoms selected');
     }
     const patient = await this.patientRepo.findOne({ where: { id: patientId } });
     if (patient.illnesses && patient.illnesses.length > 0 && riskLevel == 1) {
