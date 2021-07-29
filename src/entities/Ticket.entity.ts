@@ -71,7 +71,7 @@ export class Ticket extends PrimaryGeneratedEntity {
   })
   appointedDate?: string;
 
-  @Field()
+  @Field({ nullable: true })
   @Column({
     nullable: true,
   })
@@ -91,13 +91,13 @@ export class Ticket extends PrimaryGeneratedEntity {
   })
   location: Point;
 
-  @Field()
+  @Field({ nullable: true })
   @Column({
     nullable: true,
   })
   hospitalId?: number;
 
-  @Field()
+  @Field({ nullable: true })
   @Column({
     nullable: true,
   })

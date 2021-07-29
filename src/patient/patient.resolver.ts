@@ -1,12 +1,12 @@
 import { DataArgs, GqlUserToken, IdArgs, Roles } from '@decorator';
 import { Patient } from '@entity';
-import { Body, NotFoundException } from '@nestjs/common';
-import { Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Float, Int, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
+import { differenceInYears } from 'date-fns';
 import { JwtPayload } from '../jwt-auth/dto/jwt-auth.dto';
 import { CreatePatientDto, UpdatePatientDto } from './dto/patient.dto';
 import { PatientService } from './patient.service';
 
-@Resolver()
+@Resolver(() => Patient)
 export class PatientResolver {
   constructor(private readonly service: PatientService) {}
 
@@ -32,5 +32,11 @@ export class PatientResolver {
   @Mutation(() => Patient)
   deletePatient(@IdArgs() id: number): Promise<Patient> {
     return this.service.deleteOne({ id });
+  }
+
+  @Roles('reporter', 'queue_manager')
+  @ResolveField(() => Int)
+  age(@Parent() parent: Patient): number {
+    return differenceInYears(new Date(), new Date(parent.birthDate));
   }
 }

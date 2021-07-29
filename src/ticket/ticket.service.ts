@@ -1,10 +1,18 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { In, Repository } from 'typeorm';
 import * as DataLoader from 'dataloader';
 import { Vaccine, Symptom, Ticket, TicketStatus, Officer, Patient, Hospital } from '@entity';
-import { In, Repository } from 'typeorm';
 import { CrudService } from '../libs/crud.service';
-import { AcceptTicketDto, CreateTicketDto, EditSymptomDto } from './dto/ticket.dto';
+import {
+  AcceptTicketDto,
+  CreateTicketDto,
+  EditSymptomDto,
+  SortOption,
+  TicketByRiskLevelCountDto,
+  TicketSortableColumn,
+  TicketSortOption,
+} from './dto/ticket.dto';
 
 @Injectable()
 export class TicketService extends CrudService<Ticket> {
@@ -46,22 +54,87 @@ export class TicketService extends CrudService<Ticket> {
       .getOne();
   }
 
-  async listRequestTicket(userId: number): Promise<Ticket[]> {
-    const officer = await this.officerRepo.findOne(userId, {
+  async listRequestTicket(
+    officerId: number,
+    take: number,
+    skip: number,
+    riskLevel?: number,
+    sortOption?: TicketSortOption,
+  ): Promise<[Ticket[], number]> {
+    const officer = await this.officerRepo.findOne(officerId, {
       relations: ['hospital'],
     });
     const { x: lat, y: lng } = officer.hospital.location;
-    const tickets = await this.repo
+    let query = this.repo
       .createQueryBuilder('ticket')
+      .leftJoinAndSelect('ticket.patient', 'patient')
       .where(
-        `(ticket.location<@>point(:lat,:lng))*1.609344 < 5+30*SQRT(LEAST(48,EXTRACT(EPOCH FROM current_timestamp-ticket."createdAt")/3600))`,
+        `(ticket.location<@>point(:lat,:lng))*1.609344 <= 5+30*SQRT(LEAST(48,EXTRACT(EPOCH FROM current_timestamp-ticket."createdAt")/3600))`,
         { lat, lng },
       )
       .andWhere(`ticket.status = :status`, { status: TicketStatus.REQUEST })
-      .orderBy('ticket.riskLevel', 'DESC')
-      .addOrderBy('ticket."createdAt"', 'ASC')
-      .getMany();
-    return tickets;
+      .andWhere(riskLevel ? `ticket.riskLevel = :riskLevel` : `1=1`, { riskLevel });
+    if (sortOption) {
+      switch (sortOption.sortBy) {
+        case TicketSortableColumn.RISK_LEVEL:
+          query = query.orderBy('ticket.riskLevel', sortOption.sortOption);
+          break;
+        case TicketSortableColumn.CREATED_AT:
+          query = query.orderBy('ticket.createdAt', sortOption.sortOption);
+          break;
+        case TicketSortableColumn.BIRTH_DATE:
+          switch (sortOption.sortOption) {
+            case SortOption.ASC:
+              query = query.orderBy('patient.birthDate', SortOption.DESC);
+              break;
+            case SortOption.DESC:
+              query = query.orderBy('patient.birthDate', SortOption.ASC);
+              break;
+          }
+          break;
+      }
+    } else {
+      query = query.orderBy('ticket.riskLevel', 'DESC').addOrderBy('ticket.createdAt', 'ASC');
+    }
+    return query.take(take).skip(skip).getManyAndCount();
+  }
+
+  async listAcceptedTicket(
+    officerId: number,
+    take: number,
+    skip: number,
+    riskLevel?: number,
+    sortOption?: TicketSortOption,
+  ): Promise<[Ticket[], number]> {
+    const { hospitalId } = await this.officerRepo.findOne(officerId);
+    let query = this.repo
+      .createQueryBuilder('ticket')
+      .leftJoinAndSelect('ticket.patient', 'patient')
+      .where('ticket.hospitalId = :hospitalId', { hospitalId })
+      .andWhere(riskLevel ? `ticket.riskLevel = :riskLevel` : `1=1`, { riskLevel });
+    if (sortOption) {
+      switch (sortOption.sortBy) {
+        case TicketSortableColumn.RISK_LEVEL:
+          query = query.orderBy('ticket.riskLevel', sortOption.sortOption);
+          break;
+        case TicketSortableColumn.CREATED_AT:
+          query = query.orderBy('ticket.createdAt', sortOption.sortOption);
+          break;
+        case TicketSortableColumn.BIRTH_DATE:
+          switch (sortOption.sortOption) {
+            case SortOption.ASC:
+              query = query.orderBy('patient.birthDate', SortOption.DESC);
+              break;
+            case SortOption.DESC:
+              query = query.orderBy('patient.birthDate', SortOption.ASC);
+              break;
+          }
+          break;
+      }
+    } else {
+      query = query.orderBy('ticket.riskLevel', 'DESC').addOrderBy('ticket.createdAt', 'ASC');
+    }
+    return query.take(take).skip(skip).getManyAndCount();
   }
 
   async findTicketByNationalId(userId: number, nid: string): Promise<Ticket> {
@@ -79,6 +152,53 @@ export class TicketService extends CrudService<Ticket> {
       throw new BadRequestException('Ticket not found');
     }
     return appointmentTicket;
+  }
+
+  async findTicketForOfficer(officerId: number, ticketId: number): Promise<Ticket> {
+    const { hospitalId } = await this.officerRepo.findOne(officerId);
+    return this.repo.findOne({ hospitalId, id: ticketId });
+  }
+
+  async requestedAndAcceptedTicketCount(officerId: number): Promise<number[]> {
+    const officer = await this.officerRepo.findOne(officerId, { relations: ['hospital'] });
+    const { x: lat, y: lng } = officer.hospital.location;
+    const requestedCount = await this.repo
+      .createQueryBuilder('ticket')
+      .where(
+        `(ticket.location<@>point(:lat,:lng))*1.609344 < 5+30*SQRT(LEAST(48,EXTRACT(EPOCH FROM current_timestamp-ticket."createdAt")/3600))`,
+        { lat, lng },
+      )
+      .andWhere(`ticket.status = :status`, { status: TicketStatus.REQUEST })
+      .getCount();
+    const acceptedCount = await this.repo.count({ hospitalId: officer.hospitalId });
+    return [requestedCount, acceptedCount];
+  }
+
+  async requestedTicketByRiskLevelCount(officerId: number): Promise<TicketByRiskLevelCountDto[]> {
+    const officer = await this.officerRepo.findOne(officerId, { relations: ['hospital'] });
+    const { x: lat, y: lng } = officer.hospital.location;
+    return this.repo
+      .createQueryBuilder('ticket')
+      .select(`ticket.riskLevel`, 'riskLevel')
+      .addSelect(`COUNT(1)`, 'count')
+      .where(
+        `(ticket.location<@>point(:lat,:lng))*1.609344 < 5+30*SQRT(LEAST(48,EXTRACT(EPOCH FROM current_timestamp-ticket."createdAt")/3600))`,
+        { lat, lng },
+      )
+      .andWhere(`ticket.status = :status`, { status: TicketStatus.REQUEST })
+      .groupBy(`ticket.riskLevel`)
+      .getRawMany();
+  }
+
+  async acceptedTicketByRiskLevelCount(officerId: number): Promise<TicketByRiskLevelCountDto[]> {
+    const { hospitalId } = await this.officerRepo.findOne(officerId);
+    return this.repo
+      .createQueryBuilder('ticket')
+      .select('ticket.riskLevel', 'riskLevel')
+      .addSelect('COUNT(1)', 'count')
+      .where('ticket.hospitalId = :hospitalId', { hospitalId })
+      .groupBy('ticket.riskLevel')
+      .getRawMany();
   }
 
   async create(data: CreateTicketDto): Promise<Ticket> {
