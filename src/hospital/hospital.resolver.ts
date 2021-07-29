@@ -33,18 +33,6 @@ export class HospitalResolver {
     return this.service.findOfficerHospital(user.id);
   }
 
-  @Roles('code_generator')
-  @Mutation(() => AccessCode)
-  updateAccessCode(@GqlUserToken() userToken: JwtPayload, @DataArgs() data: UpdateAccessCodeDto): Promise<AccessCode> {
-    return this.service.updateCode(userToken.id, data.userType, data.accessCode);
-  }
-
-  @AllowUnauthenticated
-  @Query(() => Hospital)
-  checkAccessCode(@Args('access_code') accessCode: string): Promise<Hospital> {
-    return this.service.checkAccessCodeValid(accessCode);
-  }
-
   @Roles('super_admin')
   @Mutation(() => Hospital)
   editHospital(@IdArgs() id: number, @DataArgs() data: EditHospitalDto): Promise<Hospital> {

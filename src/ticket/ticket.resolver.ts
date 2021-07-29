@@ -132,7 +132,7 @@ export class TicketResolver {
   @Roles('queue_manager')
   @Mutation(() => Ticket)
   editAppointment(@GqlUserToken() userToken: JwtPayload, @DataArgs() data: EditAppointmentDto): Promise<Ticket> {
-    return this.service.acceptTicket(userToken.id, data);
+    return this.service.editAppointment(userToken.id, data);
   }
 
   @Roles('queue_manager')
@@ -141,13 +141,13 @@ export class TicketResolver {
     return this.service.cancelAppointment(id, userToken.id);
   }
 
-  @Roles('reporter', 'queue_manager')
+  @Roles('reporter', 'queue_manager', 'staff')
   @ResolveField(() => Patient)
   patient(@Parent() ticket: Ticket): Promise<Patient> {
     return this.service.findPatient.load(ticket.patientId);
   }
 
-  @Roles('reporter')
+  @Roles('reporter', 'staff')
   @ResolveField(() => Hospital, { nullable: true })
   hospital(@Parent() ticket: Ticket): Promise<Hospital> {
     if (!ticket.hospitalId) {

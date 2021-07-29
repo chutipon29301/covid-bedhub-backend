@@ -11,7 +11,6 @@ import { TicketModule } from './ticket/ticket.module';
 import { UserModule } from './user/user.module';
 import { LineModule } from './line/line.module';
 import { AuthModule } from './auth/auth.module';
-import { InviteModule } from './invite/invite.module';
 import { JwtAuthModule } from './jwt-auth/jwt-auth.module';
 import { AuthHeaderParserMiddleware } from './middleware/auth-header-parser.middleware';
 import { APP_GUARD } from '@nestjs/core';
@@ -19,6 +18,7 @@ import { PermissionsGuard } from './guard/permission.guard';
 import { PingModule } from './ping/ping.module';
 import { OfficerModule } from './officer/officer.module';
 import { ReporterModule } from './reporter/reporter.module';
+import { AccessCodeModule } from './access-code/access-code.module';
 
 @Module({
   imports: [
@@ -53,8 +53,8 @@ import { ReporterModule } from './reporter/reporter.module';
     AuthModule,
     JwtAuthModule,
     PingModule,
-    InviteModule,
     ReporterModule,
+    AccessCodeModule,
   ],
   controllers: [HealthController],
   providers: [

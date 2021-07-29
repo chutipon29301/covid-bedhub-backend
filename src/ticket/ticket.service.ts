@@ -7,6 +7,7 @@ import { CrudService } from '../libs/crud.service';
 import {
   AcceptTicketDto,
   CreateTicketDto,
+  EditAppointmentDto,
   EditSymptomDto,
   SortOption,
   TicketByRiskLevelCountDto,
@@ -264,7 +265,21 @@ export class TicketService extends CrudService<Ticket> {
     ticket.updatedById = officerId;
     ticket.hospitalId = officer.hospitalId;
     ticket.appointedDate = data.appointedDate;
+    ticket.notes = data.notes;
     return this.repo.save(ticket);
+  }
+
+  async editAppointment(officerId: number, data: EditAppointmentDto): Promise<Ticket> {
+    const { id, ...newValue } = data;
+    const officer = await this.officerRepo.findOne(officerId);
+    if (!officer) {
+      throw new BadRequestException('Officer not exist');
+    }
+    const ticket = await this.findOne({ where: { id, hospitalId: officer.hospitalId } });
+    if (!ticket) {
+      throw new BadRequestException('Ticket not exist');
+    }
+    return this.repo.save({ ...ticket, ...newValue });
   }
 
   async cancelAppointment(id: number, officerId: number): Promise<Ticket> {
