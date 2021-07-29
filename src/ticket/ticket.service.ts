@@ -337,6 +337,9 @@ export class TicketService extends CrudService<Ticket> {
         break;
       }
     }
+    if (riskLevel === 0) {
+      throw new BadRequestException('No symptoms selected');
+    }
     const patient = await this.patientRepo.findOne({ where: { id: patientId } });
     if (patient.illnesses && patient.illnesses.length > 0 && riskLevel == 1) {
       riskLevel += 1;
