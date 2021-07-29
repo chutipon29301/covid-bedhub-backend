@@ -34,9 +34,9 @@ export class HospitalResolver {
   }
 
   @Roles('code_generator')
-  @Mutation(() => Hospital)
-  updateAccessCode(@GqlUserToken() user: JwtPayload, @DataArgs() data: UpdateAccessCodeDto): Promise<Hospital> {
-    return this.service.updateCode(user.id, data.userType, data.accessCode);
+  @Mutation(() => AccessCode)
+  updateAccessCode(@GqlUserToken() userToken: JwtPayload, @DataArgs() data: UpdateAccessCodeDto): Promise<AccessCode> {
+    return this.service.updateCode(userToken.id, data.userType, data.accessCode);
   }
 
   @AllowUnauthenticated

@@ -2,12 +2,34 @@ import { Args, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/g
 import { Hospital, Patient, Ticket, Vaccine } from '@entity';
 import { TicketService } from './ticket.service';
 import { DataArgs, GqlUserToken, IdArgs, NullableQuery, Roles } from '@decorator';
-import { AcceptTicketDto, CreateTicketDto, EditAppointmentDto, EditSymptomDto } from './dto/ticket.dto';
+import {
+  AcceptTicketDto,
+  CreateTicketDto,
+  EditAppointmentDto,
+  EditSymptomDto,
+  RequestedAndAcceptedTicketCountDto,
+  RequestTicketQueryDto,
+  TicketByRiskLevelCountDto,
+  TicketPaginationDto,
+  TicketSortOption,
+} from './dto/ticket.dto';
 import { JwtPayload } from '../jwt-auth/dto/jwt-auth.dto';
 
 @Resolver(() => Ticket)
 export class TicketResolver {
   constructor(private readonly service: TicketService) {}
+
+  @Roles('queue_manager')
+  @NullableQuery(() => Ticket)
+  requestedTicket(@IdArgs() id: number): Promise<Ticket> {
+    return this.service.findOne(id);
+  }
+
+  @Roles('queue_manager')
+  @NullableQuery(() => Ticket)
+  acceptedTicket(@GqlUserToken() userToken: JwtPayload, @IdArgs() id: number): Promise<Ticket> {
+    return this.service.findTicketForOfficer(userToken.id, id);
+  }
 
   @Roles('reporter')
   @NullableQuery(() => Ticket)
@@ -16,9 +38,61 @@ export class TicketResolver {
   }
 
   @Roles('queue_manager')
-  @Query(() => [Ticket])
-  requestedTicket(@GqlUserToken() userToken: JwtPayload): Promise<Ticket[]> {
-    return this.service.listRequestTicket(userToken.id);
+  @Query(() => [TicketByRiskLevelCountDto])
+  async requestedTicketByRiskLevelCount(@GqlUserToken() userToken: JwtPayload): Promise<TicketByRiskLevelCountDto[]> {
+    return this.service.requestedTicketByRiskLevelCount(userToken.id);
+  }
+
+  @Roles('queue_manager')
+  @Query(() => [TicketByRiskLevelCountDto])
+  async acceptedTicketByRiskLevelCount(@GqlUserToken() userToken: JwtPayload): Promise<TicketByRiskLevelCountDto[]> {
+    return this.service.acceptedTicketByRiskLevelCount(userToken.id);
+  }
+
+  @Roles('queue_manager')
+  @Query(() => RequestedAndAcceptedTicketCountDto)
+  async requestedAndAcceptedTicketsCount(
+    @GqlUserToken() userToken: JwtPayload,
+  ): Promise<RequestedAndAcceptedTicketCountDto> {
+    const [requestedCount, acceptedCount] = await this.service.requestedAndAcceptedTicketCount(userToken.id);
+    return {
+      requestedCount,
+      acceptedCount,
+    };
+  }
+
+  @Roles('queue_manager')
+  @Query(() => TicketPaginationDto)
+  async requestedTickets(
+    @GqlUserToken() userToken: JwtPayload,
+    @DataArgs({ nullable: true, defaultValue: { take: 15, skip: 0 } }) data: RequestTicketQueryDto,
+    @Args('sortOptions', { nullable: true }) sortOption: TicketSortOption,
+  ): Promise<TicketPaginationDto> {
+    const [tickets, count] = await this.service.listRequestTicket(
+      userToken.id,
+      data.take,
+      data.skip,
+      data.riskLevel,
+      sortOption,
+    );
+    return { tickets, count };
+  }
+
+  @Roles('queue_manager')
+  @Query(() => TicketPaginationDto)
+  async acceptedTickets(
+    @GqlUserToken() userToken: JwtPayload,
+    @DataArgs({ nullable: true, defaultValue: { take: 15, skip: 0 } }) data: RequestTicketQueryDto,
+    @Args('sortOptions', { nullable: true }) sortOption: TicketSortOption,
+  ): Promise<TicketPaginationDto> {
+    const [tickets, count] = await this.service.listAcceptedTicket(
+      userToken.id,
+      data.take,
+      data.skip,
+      data.riskLevel,
+      sortOption,
+    );
+    return { tickets, count };
   }
 
   @Roles('staff', 'queue_manager')
@@ -51,13 +125,13 @@ export class TicketResolver {
 
   @Roles('queue_manager')
   @Mutation(() => Ticket)
-  acceptTicket(@GqlUserToken() userToken: JwtPayload, data: AcceptTicketDto): Promise<Ticket> {
+  acceptTicket(@GqlUserToken() userToken: JwtPayload, @DataArgs() data: AcceptTicketDto): Promise<Ticket> {
     return this.service.acceptTicket(userToken.id, data);
   }
 
   @Roles('queue_manager')
   @Mutation(() => Ticket)
-  editAppointment(@GqlUserToken() userToken: JwtPayload, data: EditAppointmentDto): Promise<Ticket> {
+  editAppointment(@GqlUserToken() userToken: JwtPayload, @DataArgs() data: EditAppointmentDto): Promise<Ticket> {
     return this.service.acceptTicket(userToken.id, data);
   }
 
@@ -67,7 +141,7 @@ export class TicketResolver {
     return this.service.cancelAppointment(id, userToken.id);
   }
 
-  @Roles('reporter')
+  @Roles('reporter', 'queue_manager')
   @ResolveField(() => Patient)
   patient(@Parent() ticket: Ticket): Promise<Patient> {
     return this.service.findPatient.load(ticket.patientId);
@@ -82,7 +156,7 @@ export class TicketResolver {
     return this.service.findHospital.load(ticket.hospitalId);
   }
 
-  @Roles('reporter')
+  @Roles('reporter', 'queue_manager')
   @ResolveField(() => [Vaccine])
   vaccines(@Parent() ticket: Ticket): Promise<Vaccine[]> {
     return this.service.findVaccines.load(ticket.id);

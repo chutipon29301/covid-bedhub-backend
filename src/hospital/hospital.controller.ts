@@ -28,12 +28,6 @@ export class HospitalController {
   }
 
   @Roles('code_generator')
-  @Post('/set-code')
-  async setCode(@UserToken() user: JwtPayload, @Body() body: UpdateCodeDto): Promise<Hospital> {
-    return await this.hospitalService.updateCode(user.id, body.userType, body.newCode);
-  }
-
-  @Roles('code_generator')
   @Patch('/:id')
   async edit(@IdParam() id: number, @Body() hospital: UpdateHospitalDto) {
     return this.hospitalService.updateOne({ id }, hospital);
