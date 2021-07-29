@@ -132,7 +132,7 @@ export class TicketResolver {
   @Roles('queue_manager')
   @Mutation(() => Ticket)
   editAppointment(@GqlUserToken() userToken: JwtPayload, @DataArgs() data: EditAppointmentDto): Promise<Ticket> {
-    return this.service.acceptTicket(userToken.id, data);
+    return this.service.editAppointment(userToken.id, data);
   }
 
   @Roles('queue_manager')
