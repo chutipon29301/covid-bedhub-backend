@@ -21,8 +21,8 @@ export class PatientService extends CrudService<Patient> {
 
   private async checkID(nid: string): Promise<boolean> {
     if (nid.length === 13 && /^[0-9]\d+$/.test(nid)) {
-      const sum = 0;
-      for (let i = 0, sum = 0; i < 12; i++) {
+      let sum = 0;
+      for (let i = 0; i < 12; i++) {
         sum += +nid.charAt(i) * (13 - i);
       }
       return (11 - (sum % 11)) % 10 === +nid.charAt(12);
