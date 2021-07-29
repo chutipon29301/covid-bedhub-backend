@@ -142,6 +142,12 @@ export class TicketService extends CrudService<Ticket> {
   async findTicketByNationalId(officerId: number, nid: string): Promise<AppointmentInfoDto> {
     const officer = await this.officerRepo.findOne({ id: officerId });
     const patient = await this.patientRepo.findOne({ where: { identification: nid } });
+    if (!patient) {
+      return {
+        ticket: null,
+        hospital: null,
+      };
+    }
     const [ticket] = await this.repo.find({
       where: {
         patientId: patient.id,
