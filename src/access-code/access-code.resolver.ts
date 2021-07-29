@@ -1,7 +1,7 @@
-import { Args, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Parent, ResolveField, Resolver } from '@nestjs/graphql';
 import { AccessCode } from '@entity';
 import { AccessCodeService } from './access-code.service';
-import { AllowUnauthenticated, DataArgs, GqlUserToken, Roles } from '../decorators';
+import { AllowUnauthenticated, DataArgs, GqlUserToken, NullableQuery, Roles } from '../decorators';
 import { AccessCodeHospital } from './dto/access-code.dto';
 import { UpdateAccessCodeDto } from 'src/hospital/dto/hospital.dto';
 import { JwtPayload } from 'src/jwt-auth/dto/jwt-auth.dto';
@@ -11,7 +11,7 @@ export class AccessCodeResolver {
   constructor(private readonly service: AccessCodeService) {}
 
   @AllowUnauthenticated
-  @Query(() => AccessCode)
+  @NullableQuery(() => AccessCode)
   checkAccessCode(@Args('access_code') accessCode: string): Promise<AccessCode> {
     return this.service.findOne({ accessCode });
   }
