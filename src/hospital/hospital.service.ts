@@ -49,20 +49,4 @@ export class HospitalService extends CrudService<Hospital> {
     const officer = await this.officerRepo.findOne({ id: userId });
     return this.repo.findOne({ id: officer.hospitalId });
   }
-
-  async updateCode(officerId: number, userType: UserType, newCode: string): Promise<AccessCode> {
-    const { hospitalId } = await this.officerRepo.findOne(officerId);
-    const accessCode = await this.accessCodeRepo.findOne({ where: { hospitalId, userType } });
-    accessCode.accessCode = newCode;
-    return this.accessCodeRepo.save(accessCode);
-  }
-
-  async checkAccessCodeValid(accessCode: string): Promise<Hospital> {
-    const validCode = await this.accessCodeRepo.findOne({ where: { accessCode } });
-    if (!validCode) {
-      throw new NotFoundException('Access code not found');
-    }
-    const hospital = await this.repo.findOne({ where: { id: validCode.hospitalId } });
-    return hospital;
-  }
 }
