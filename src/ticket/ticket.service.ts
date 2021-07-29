@@ -6,6 +6,7 @@ import { Vaccine, Symptom, Ticket, TicketStatus, Officer, Patient, Hospital } fr
 import { CrudService } from '../libs/crud.service';
 import {
   AcceptTicketDto,
+  AppointmentInfoDto,
   CreateTicketDto,
   EditAppointmentDto,
   EditSymptomDto,
@@ -138,21 +139,35 @@ export class TicketService extends CrudService<Ticket> {
     return query.take(take).skip(skip).getManyAndCount();
   }
 
-  async findTicketByNationalId(userId: number, nid: string): Promise<Ticket> {
-    const officer = await this.officerRepo.findOne({ id: userId });
+  async findTicketByNationalId(officerId: number, nid: string): Promise<AppointmentInfoDto> {
+    const officer = await this.officerRepo.findOne({ id: officerId });
     const patient = await this.patientRepo.findOne({ where: { identification: nid } });
-    const appointmentTicket = await this.repo.findOne({
+    const [ticket] = await this.repo.find({
       where: {
-        hospitalId: officer.hospitalId,
         patientId: patient.id,
         status: TicketStatus.MATCH,
       },
-      order: { id: 'DESC' },
+      relations: ['hospital'],
+      order: { createdAt: 'DESC' },
+      take: 1,
     });
-    if (!appointmentTicket) {
-      throw new BadRequestException('Ticket not found');
+    if (!ticket) {
+      return {
+        ticket: null,
+        hospital: null,
+      };
     }
-    return appointmentTicket;
+    if (ticket.hospitalId === officer.hospitalId) {
+      return {
+        ticket,
+        hospital: ticket.hospital,
+      };
+    } else {
+      return {
+        ticket: null,
+        hospital: ticket.hospital,
+      };
+    }
   }
 
   async findTicketForOfficer(officerId: number, ticketId: number): Promise<Ticket> {
