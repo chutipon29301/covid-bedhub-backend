@@ -23,17 +23,10 @@ export class PatientService extends CrudService<Patient> {
     if (nid.length === 13 && /^[0-9]\d+$/.test(nid)) {
       const sum = 0;
       for (let i = 0, sum = 0; i < 12; i++) {
-        sum += parseInt(nid.charAt(i)) * (13 - i);
+        sum += +nid.charAt(i) * (13 - i);
       }
-      const check = (11 - (sum % 11)) % 10;
-      if (check !== parseInt(nid.charAt(12))) {
-        return false;
-      }
-    } else if (!/^(?!^0+$)[a-zA-Z0-9]{3,20}$/.test(nid)) {
-      return false;
-    } else {
-      return false;
+      return (11 - (sum % 11)) % 10 === +nid.charAt(12);
     }
-    return true;
+    return /^(?!^0+$)[a-zA-Z0-9]{3,20}$/.test(nid);
   }
 }
