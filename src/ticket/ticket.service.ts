@@ -6,7 +6,9 @@ import { Vaccine, Symptom, Ticket, TicketStatus, Officer, Patient, Hospital } fr
 import { CrudService } from '../libs/crud.service';
 import {
   AcceptTicketDto,
+  AppointmentInfoDto,
   CreateTicketDto,
+  EditAppointmentDto,
   EditSymptomDto,
   SortOption,
   TicketByRiskLevelCountDto,
@@ -137,21 +139,41 @@ export class TicketService extends CrudService<Ticket> {
     return query.take(take).skip(skip).getManyAndCount();
   }
 
-  async findTicketByNationalId(userId: number, nid: string): Promise<Ticket> {
-    const officer = await this.officerRepo.findOne({ id: userId });
+  async findTicketByNationalId(officerId: number, nid: string): Promise<AppointmentInfoDto> {
+    const officer = await this.officerRepo.findOne({ id: officerId });
     const patient = await this.patientRepo.findOne({ where: { identification: nid } });
-    const appointmentTicket = await this.repo.findOne({
+    if (!patient) {
+      return {
+        ticket: null,
+        hospital: null,
+      };
+    }
+    const [ticket] = await this.repo.find({
       where: {
-        hospitalId: officer.hospitalId,
         patientId: patient.id,
         status: TicketStatus.MATCH,
       },
-      order: { id: 'DESC' },
+      relations: ['hospital'],
+      order: { createdAt: 'DESC' },
+      take: 1,
     });
-    if (!appointmentTicket) {
-      throw new BadRequestException('Ticket not found');
+    if (!ticket) {
+      return {
+        ticket: null,
+        hospital: null,
+      };
     }
-    return appointmentTicket;
+    if (ticket.hospitalId === officer.hospitalId) {
+      return {
+        ticket,
+        hospital: ticket.hospital,
+      };
+    } else {
+      return {
+        ticket: null,
+        hospital: ticket.hospital,
+      };
+    }
   }
 
   async findTicketForOfficer(officerId: number, ticketId: number): Promise<Ticket> {
@@ -264,7 +286,21 @@ export class TicketService extends CrudService<Ticket> {
     ticket.updatedById = officerId;
     ticket.hospitalId = officer.hospitalId;
     ticket.appointedDate = data.appointedDate;
+    ticket.notes = data.notes;
     return this.repo.save(ticket);
+  }
+
+  async editAppointment(officerId: number, data: EditAppointmentDto): Promise<Ticket> {
+    const { id, ...newValue } = data;
+    const officer = await this.officerRepo.findOne(officerId);
+    if (!officer) {
+      throw new BadRequestException('Officer not exist');
+    }
+    const ticket = await this.findOne({ where: { id, hospitalId: officer.hospitalId } });
+    if (!ticket) {
+      throw new BadRequestException('Ticket not exist');
+    }
+    return this.repo.save({ ...ticket, ...newValue });
   }
 
   async cancelAppointment(id: number, officerId: number): Promise<Ticket> {
@@ -289,6 +325,9 @@ export class TicketService extends CrudService<Ticket> {
   }
 
   private async calculateRiskLevel(patientId: number, symptoms: Symptom[]): Promise<number> {
+    if (symptoms.length === 0) {
+      throw new BadRequestException('No symptoms selected');
+    }
     let riskLevel = 0;
     const risk1 = [Symptom.FEVER, Symptom.COUGH, Symptom.SMELLESS_RASH];
     const risk2 = [Symptom.DIARRHEA, Symptom.TIRED_HEADACHE, Symptom.DIFFICULT_BREATHING, Symptom.ANGINA];

@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as DataLoader from 'dataloader';
 
-import { Officer, Hospital, AccessCode } from '@entity';
+import { Officer, Hospital, AccessCode, OfficerRole, UserType } from '@entity';
 import { CrudService } from '../libs/crud.service';
 import { CreateOfficerDto } from './dto/officer.dto';
 
@@ -32,6 +32,11 @@ export class OfficerService extends CrudService<Officer> {
     if (!accessCode) {
       throw new BadRequestException('Access code not exist');
     }
-    return this.create({ ...data, hospitalId: accessCode.hospitalId });
+
+    return this.create({
+      ...data,
+      hospitalId: accessCode.hospitalId,
+      role: accessCode.userType === UserType.QUEUE_MANAGER ? OfficerRole.QUEUE_MANAGER : OfficerRole.STAFF,
+    });
   }
 }

@@ -19,7 +19,7 @@ export class UserService {
     }
     const newProfile = new Reporter();
     newProfile.lineId = lineId;
-    return this.reporterRepo.create(newProfile);
+    return this.reporterRepo.save(newProfile);
   }
 
   async createOfficer(user: CreateOfficerDto): Promise<Officer> {

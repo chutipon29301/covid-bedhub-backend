@@ -4,6 +4,7 @@ import { TicketService } from './ticket.service';
 import { DataArgs, GqlUserToken, IdArgs, NullableQuery, Roles } from '@decorator';
 import {
   AcceptTicketDto,
+  AppointmentInfoDto,
   CreateTicketDto,
   EditAppointmentDto,
   EditSymptomDto,
@@ -96,8 +97,8 @@ export class TicketResolver {
   }
 
   @Roles('staff', 'queue_manager')
-  @Query(() => Ticket)
-  ticketByNationalId(@GqlUserToken() userToken: JwtPayload, @Args('nid') nid: string): Promise<Ticket> {
+  @Query(() => AppointmentInfoDto)
+  ticketByNationalId(@GqlUserToken() userToken: JwtPayload, @Args('nid') nid: string): Promise<AppointmentInfoDto> {
     return this.service.findTicketByNationalId(userToken.id, nid);
   }
 
@@ -132,7 +133,7 @@ export class TicketResolver {
   @Roles('queue_manager')
   @Mutation(() => Ticket)
   editAppointment(@GqlUserToken() userToken: JwtPayload, @DataArgs() data: EditAppointmentDto): Promise<Ticket> {
-    return this.service.acceptTicket(userToken.id, data);
+    return this.service.editAppointment(userToken.id, data);
   }
 
   @Roles('queue_manager')
@@ -141,13 +142,13 @@ export class TicketResolver {
     return this.service.cancelAppointment(id, userToken.id);
   }
 
-  @Roles('reporter', 'queue_manager')
+  @Roles('reporter', 'queue_manager', 'staff')
   @ResolveField(() => Patient)
   patient(@Parent() ticket: Ticket): Promise<Patient> {
     return this.service.findPatient.load(ticket.patientId);
   }
 
-  @Roles('reporter')
+  @Roles('reporter', 'staff')
   @ResolveField(() => Hospital, { nullable: true })
   hospital(@Parent() ticket: Ticket): Promise<Hospital> {
     if (!ticket.hospitalId) {

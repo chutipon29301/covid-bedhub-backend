@@ -4,7 +4,7 @@ import { compare } from 'bcrypt';
 import { stringify } from 'qs';
 import { Repository } from 'typeorm';
 import { Officer, OfficerRole } from '../entities';
-import { AccountType, JwtTokenInfo } from '../jwt-auth/dto/jwt-auth.dto';
+import { JwtTokenInfo } from '../jwt-auth/dto/jwt-auth.dto';
 import { JwtAuthService } from '../jwt-auth/jwt-auth.service';
 import { LineService } from '../line/line.service';
 import { ConfigService } from '../types';
