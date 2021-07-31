@@ -13,12 +13,13 @@ import { LineModule } from './line/line.module';
 import { AuthModule } from './auth/auth.module';
 import { JwtAuthModule } from './jwt-auth/jwt-auth.module';
 import { AuthHeaderParserMiddleware } from './middleware/auth-header-parser.middleware';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { PermissionsGuard } from './guard/permission.guard';
 import { PingModule } from './ping/ping.module';
 import { OfficerModule } from './officer/officer.module';
 import { ReporterModule } from './reporter/reporter.module';
 import { AccessCodeModule } from './access-code/access-code.module';
+import { SentryInterceptor } from './sentry.interceptor';
 
 @Module({
   imports: [
@@ -61,6 +62,10 @@ import { AccessCodeModule } from './access-code/access-code.module';
     {
       provide: APP_GUARD,
       useClass: PermissionsGuard,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: SentryInterceptor,
     },
   ],
 })
