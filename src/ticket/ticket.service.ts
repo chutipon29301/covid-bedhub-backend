@@ -324,20 +324,19 @@ export class TicketService extends CrudService<Ticket> {
     return this.repo.save(ticket);
   }
 
-  private async calculateRiskLevel(patientId: number, symptoms: Symptom[]): Promise<number> {
-    if (symptoms.length === 0) {
-      throw new BadRequestException('No symptoms selected');
-    }
+  private async calculateRiskLevel(patientId: number, symptoms?: Symptom[]): Promise<number> {
     let riskLevel = 0;
     const risk1 = [Symptom.FEVER, Symptom.COUGH, Symptom.SMELLESS_RASH];
     const risk2 = [Symptom.DIARRHEA, Symptom.TIRED_HEADACHE, Symptom.DIFFICULT_BREATHING, Symptom.ANGINA];
     const risk3 = [Symptom.EXHAUSTED, Symptom.CHEST_PAIN, Symptom.UNCONCIOUS];
     const risks = [risk3, risk2, risk1];
-    for (const [index, riskFactors] of risks.entries()) {
-      const found = symptoms.filter(value => riskFactors.includes(value));
-      if (found.length > 0) {
-        riskLevel = risks.length - index;
-        break;
+    if (symptoms) {
+      for (const [index, riskFactors] of risks.entries()) {
+        const found = symptoms.filter(value => riskFactors.includes(value));
+        if (found.length > 0) {
+          riskLevel = risks.length - index;
+          break;
+        }
       }
     }
     const patient = await this.patientRepo.findOne({ where: { id: patientId } });
