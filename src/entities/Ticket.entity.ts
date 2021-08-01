@@ -48,13 +48,14 @@ export class Ticket extends PrimaryGeneratedEntity {
   @Column()
   examLocation: string;
 
-  @Field(() => [Symptom])
+  @Field(() => [Symptom], { nullable: true })
   @Column({
     type: 'enum',
     enum: Symptom,
     array: true,
+    nullable: true,
   })
-  symptoms: Symptom[];
+  symptoms?: Symptom[];
 
   @Field(() => TicketStatus)
   @Column({
