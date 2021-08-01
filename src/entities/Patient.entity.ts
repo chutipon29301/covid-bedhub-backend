@@ -15,6 +15,12 @@ export enum Illness {
 }
 registerEnumType(Illness, { name: 'Illness' });
 
+export enum Gender {
+  MALE = 'MALE',
+  FEMALE = 'FEMALE',
+}
+registerEnumType(Gender, { name: 'Gender' });
+
 @ObjectType()
 @Entity()
 export class Patient extends PrimaryGeneratedEntity {
@@ -42,9 +48,12 @@ export class Patient extends PrimaryGeneratedEntity {
   @Column()
   tel: string;
 
-  @Field()
-  @Column()
-  sex: string;
+  @Field(() => Gender)
+  @Column({
+    type: 'enum',
+    enum: Gender,
+  })
+  sex: Gender;
 
   @Field(() => [Illness])
   @Column({
