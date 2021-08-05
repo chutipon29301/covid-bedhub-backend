@@ -71,7 +71,7 @@ export class TicketService extends CrudService<Ticket> {
       .createQueryBuilder('ticket')
       .leftJoinAndSelect('ticket.patient', 'patient')
       .where(
-        `(ticket.location<@>point(:lat,:lng))*1.609344 <= 5+30*SQRT(LEAST(48,EXTRACT(EPOCH FROM current_timestamp-ticket."createdAt")/3600))`,
+        `(ticket.location<@>point(:lat,:lng))*1.609344 <= 10+40*SQRT(LEAST(48,EXTRACT(EPOCH FROM current_timestamp-ticket."createdAt")/3600))`,
         { lat, lng },
       )
       .andWhere(`ticket.status = :status`, { status: TicketStatus.REQUEST })
@@ -187,7 +187,7 @@ export class TicketService extends CrudService<Ticket> {
     const requestedCount = await this.repo
       .createQueryBuilder('ticket')
       .where(
-        `(ticket.location<@>point(:lat,:lng))*1.609344 < 5+30*SQRT(LEAST(48,EXTRACT(EPOCH FROM current_timestamp-ticket."createdAt")/3600))`,
+        `(ticket.location<@>point(:lat,:lng))*1.609344 < 10+40*SQRT(LEAST(48,EXTRACT(EPOCH FROM current_timestamp-ticket."createdAt")/3600))`,
         { lat, lng },
       )
       .andWhere(`ticket.status = :status`, { status: TicketStatus.REQUEST })
@@ -204,7 +204,7 @@ export class TicketService extends CrudService<Ticket> {
       .select(`ticket.riskLevel`, 'riskLevel')
       .addSelect(`COUNT(1)`, 'count')
       .where(
-        `(ticket.location<@>point(:lat,:lng))*1.609344 < 5+30*SQRT(LEAST(48,EXTRACT(EPOCH FROM current_timestamp-ticket."createdAt")/3600))`,
+        `(ticket.location<@>point(:lat,:lng))*1.609344 < 10+40*SQRT(LEAST(48,EXTRACT(EPOCH FROM current_timestamp-ticket."createdAt")/3600))`,
         { lat, lng },
       )
       .andWhere(`ticket.status = :status`, { status: TicketStatus.REQUEST })
