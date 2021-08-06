@@ -73,7 +73,7 @@ export class TicketService extends CrudService<Ticket> {
       .where(`ticket.status = :status`, { status: TicketStatus.REQUEST })
       .andWhere(riskLevel ? `ticket.riskLevel = :riskLevel` : `1=1`, { riskLevel });
     if (!officer.hospital.isPage) {
-      query.andWhere(
+      query = query.andWhere(
         `(ticket.location<@>point(:lat,:lng))*1.609344 <= 10+40*SQRT(LEAST(48,EXTRACT(EPOCH FROM current_timestamp-ticket."createdAt")/3600))`,
         { lat, lng },
       );
@@ -186,16 +186,16 @@ export class TicketService extends CrudService<Ticket> {
   async requestedAndAcceptedTicketCount(officerId: number): Promise<number[]> {
     const officer = await this.officerRepo.findOne(officerId, { relations: ['hospital'] });
     const { x: lat, y: lng } = officer.hospital.location;
-    const requested = this.repo
+    let query = this.repo
       .createQueryBuilder('ticket')
       .where(`ticket.status = :status`, { status: TicketStatus.REQUEST });
     if (!officer.hospital.isPage) {
-      requested.andWhere(
+      query = query.andWhere(
         `(ticket.location<@>point(:lat,:lng))*1.609344 < 10+40*SQRT(LEAST(48,EXTRACT(EPOCH FROM current_timestamp-ticket."createdAt")/3600))`,
         { lat, lng },
       );
     }
-    const requestedCount = await requested.getCount();
+    const requestedCount = await query.getCount();
     const acceptedCount = await this.repo.count({ hospitalId: officer.hospitalId });
     return [requestedCount, acceptedCount];
   }
@@ -203,18 +203,18 @@ export class TicketService extends CrudService<Ticket> {
   async requestedTicketByRiskLevelCount(officerId: number): Promise<TicketByRiskLevelCountDto[]> {
     const officer = await this.officerRepo.findOne(officerId, { relations: ['hospital'] });
     const { x: lat, y: lng } = officer.hospital.location;
-    const requestedRisk = this.repo
+    let query = this.repo
       .createQueryBuilder('ticket')
       .select(`ticket.riskLevel`, 'riskLevel')
       .addSelect(`COUNT(1)`, 'count')
       .where(`ticket.status = :status`, { status: TicketStatus.REQUEST });
     if (!officer.hospital.isPage) {
-      requestedRisk.andWhere(
+      query = query.andWhere(
         `(ticket.location<@>point(:lat,:lng))*1.609344 < 10+40*SQRT(LEAST(48,EXTRACT(EPOCH FROM current_timestamp-ticket."createdAt")/3600))`,
         { lat, lng },
       );
     }
-    return requestedRisk.groupBy(`ticket.riskLevel`).getRawMany();
+    return query.groupBy(`ticket.riskLevel`).getRawMany();
   }
 
   async acceptedTicketByRiskLevelCount(officerId: number): Promise<TicketByRiskLevelCountDto[]> {

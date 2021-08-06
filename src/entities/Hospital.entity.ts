@@ -52,10 +52,10 @@ export class Hospital extends PrimaryGeneratedEntity {
   officers?: Officer[];
 
   @Field()
-  @Column()
-  isPage: boolean
+  @Column({ default: false })
+  isPage: boolean;
 
   @Field()
-  @Column()
-  isActive: boolean
+  @Column({ default: true })
+  isActive: boolean;
 }
