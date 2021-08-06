@@ -1,12 +1,12 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { nanoid } from 'nanoid';
 import * as DataLoader from 'dataloader';
 
-import { AccessCode, Officer, UserType, Hospital } from '@entity';
+import { AccessCode, Officer, UserType, Hospital, OfficerRole } from '@entity';
 import { CrudService } from '../libs/crud.service';
-import { CreateHospitalDto } from './dto/hospital.dto';
+import { CreateHospitalDto, CreateHospitalResponse } from './dto/hospital.dto';
 
 @Injectable()
 export class HospitalService extends CrudService<Hospital> {
@@ -29,20 +29,37 @@ export class HospitalService extends CrudService<Hospital> {
     );
   }
 
-  async createOne(body: CreateHospitalDto): Promise<Hospital> {
+  async createOne(data: CreateHospitalDto): Promise<CreateHospitalResponse> {
+    const { lat, lng, username, ...body } = data;
     const staffAccessCode = new AccessCode();
     const queueAccessCode = new AccessCode();
     staffAccessCode.accessCode = nanoid(6);
     queueAccessCode.accessCode = nanoid(6);
     staffAccessCode.userType = UserType.STAFF;
     queueAccessCode.userType = UserType.QUEUE_MANAGER;
-    const hospital = await this.create({
+    let location: { x: number; y: number };
+    if (lat && lng) {
+      location = {
+        x: lat,
+        y: lng,
+      };
+    }
+    const hospital = await super.create({
       ...body,
+      location,
     });
     staffAccessCode.hospitalId = hospital.id;
     queueAccessCode.hospitalId = hospital.id;
     await this.accessCodeRepo.save([staffAccessCode, queueAccessCode]);
-    return hospital;
+    const password = nanoid(10);
+    const officer = this.officerRepo.create({
+      username,
+      password,
+      role: OfficerRole.CODE_GENERATOR,
+      hospitalId: hospital.id,
+    });
+    await this.officerRepo.save(officer);
+    return { hospital, codeGeneratorPassword: password, codeGeneratorUsername: username };
   }
 
   async findOfficerHospital(userId: number): Promise<Hospital> {
