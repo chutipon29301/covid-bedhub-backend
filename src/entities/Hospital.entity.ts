@@ -50,4 +50,12 @@ export class Hospital extends PrimaryGeneratedEntity {
 
   @OneToMany(() => Officer, o => o.hospital)
   officers?: Officer[];
+
+  @Field()
+  @Column({ default: false })
+  isPage: boolean;
+
+  @Field()
+  @Column({ default: true })
+  isActive: boolean;
 }
