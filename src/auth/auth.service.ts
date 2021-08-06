@@ -50,7 +50,11 @@ export class AuthService {
   }
 
   async getProfileJwtForOfficer(username: string, password: string): Promise<JwtTokenInfo> {
-    const officer = await this.officerRepo.findOne({ select: ['username', 'password', 'role'], where: { username } });
+    const officer = await this.officerRepo.findOne({
+      select: ['id', 'username', 'password', 'role'],
+      where: { username },
+    });
+    console.log(officer);
     if (!officer) {
       throw new BadRequestException('username or password is incorrect');
     }
