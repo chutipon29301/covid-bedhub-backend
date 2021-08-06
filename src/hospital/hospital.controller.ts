@@ -21,11 +21,11 @@ export class HospitalController {
     return this.hospitalService.findOfficerHospital(id);
   }
 
-  @Roles('code_generator')
-  @Post('/:id')
-  async add(@Body() body: CreateHospitalDto): Promise<Hospital> {
-    return await this.hospitalService.createOne(body);
-  }
+  // @Roles('code_generator')
+  // @Post('/:id')
+  // async add(@Body() body: CreateHospitalDto): Promise<Hospital> {
+  //   return await this.hospitalService.createOne(body);
+  // }
 
   @Roles('code_generator')
   @Patch('/:id')

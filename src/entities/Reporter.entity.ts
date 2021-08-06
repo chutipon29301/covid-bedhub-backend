@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm';
+import { Column, Entity, OneToMany } from 'typeorm';
 import { PrimaryGeneratedEntity } from './PrimaryGenerated.abstract';
 import { Patient } from './Patient.entity';
 import { ObjectType } from '@nestjs/graphql';

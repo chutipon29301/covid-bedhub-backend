@@ -1,6 +1,6 @@
 import { IsString, IsNumber, IsEnum } from 'class-validator';
 import { AccessCode, Hospital, UserType } from '@entity';
-import { Field, InputType, PartialType, PickType } from '@nestjs/graphql';
+import { Field, InputType, IntersectionType, ObjectType, PartialType, PickType } from '@nestjs/graphql';
 import { OmitPrimaryGeneratedMetadata } from '@entity';
 export class UpdateCodeDto {
   @IsEnum(UserType)
@@ -37,12 +37,19 @@ export class UpdateHospitalDto {
 }
 
 @InputType()
-export class CreateHospitalDto extends OmitPrimaryGeneratedMetadata(Hospital, ['location'] as const) {
-  @Field()
+export class CreateHospitalDto extends IntersectionType(
+  PickType(Hospital, ['name'] as const),
+  PartialType(PickType(Hospital, ['isPage'] as const)),
+  InputType,
+) {
+  @Field({ nullable: true })
   lat: number;
 
-  @Field()
+  @Field({ nullable: true })
   lng: number;
+
+  @Field()
+  username: string;
 }
 
 @InputType()
@@ -50,3 +57,13 @@ export class UpdateAccessCodeDto extends PickType(AccessCode, ['accessCode', 'us
 
 @InputType()
 export class EditHospitalDto extends PartialType(OmitPrimaryGeneratedMetadata(Hospital), InputType) {}
+
+@ObjectType()
+export class CreateHospitalResponse {
+  @Field(() => Hospital)
+  hospital: Hospital;
+  @Field()
+  codeGeneratorUsername: string;
+  @Field()
+  codeGeneratorPassword: string;
+}

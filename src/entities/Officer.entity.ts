@@ -9,6 +9,7 @@ export enum OfficerRole {
   CODE_GENERATOR = 'CODE_GENERATOR',
   QUEUE_MANAGER = 'QUEUE_MANAGER',
   STAFF = 'STAFF',
+  SUPER_ADMIN = 'SUPER_ADMIN',
 }
 @ObjectType()
 @Entity()
@@ -20,12 +21,12 @@ export class Officer extends PrimaryGeneratedEntity {
   @Column({ select: false })
   password: string;
 
-  @Field()
-  @Column()
+  @Field({ nullable: true })
+  @Column({ nullable: true })
   firstName: string;
 
-  @Field()
-  @Column()
+  @Field({ nullable: true })
+  @Column({ nullable: true })
   lastName: string;
 
   @Field({ nullable: true })

@@ -74,6 +74,11 @@ export class AuthService {
           id: officer.id,
           accountType: 'queue_manager',
         });
+      case OfficerRole.SUPER_ADMIN:
+        return this.jwtAuthService.sign({
+          id: officer.id,
+          accountType: 'super_admin',
+        });
     }
   }
 

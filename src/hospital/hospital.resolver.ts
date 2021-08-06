@@ -1,9 +1,9 @@
-import { Args, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
+import { Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { AccessCode, Hospital } from '@entity';
 import { HospitalService } from './hospital.service';
-import { AllowUnauthenticated, DataArgs, GqlUserToken, IdArgs, NullableQuery, Roles } from '@decorator';
+import { DataArgs, GqlUserToken, IdArgs, NullableQuery, Roles } from '@decorator';
 import { JwtPayload } from '../jwt-auth/dto/jwt-auth.dto';
-import { CreateHospitalDto, EditHospitalDto, UpdateAccessCodeDto } from './dto/hospital.dto';
+import { CreateHospitalDto, CreateHospitalResponse, EditHospitalDto } from './dto/hospital.dto';
 
 @Resolver(() => Hospital)
 export class HospitalResolver {
@@ -22,9 +22,11 @@ export class HospitalResolver {
   }
 
   @Roles('super_admin')
-  @Mutation(() => Hospital)
-  createHospital(@DataArgs() data: CreateHospitalDto): Promise<Hospital> {
-    return this.service.create({ ...data, location: { x: data.lat, y: data.lng } });
+  @Mutation(() => CreateHospitalResponse)
+  async createHospital(@DataArgs() data: CreateHospitalDto): Promise<CreateHospitalResponse> {
+    const res = await this.service.createOne(data);
+    console.log(res);
+    return res;
   }
 
   @Roles('code_generator', 'queue_manager', 'reporter')
@@ -42,6 +44,7 @@ export class HospitalResolver {
   @Roles('super_admin', 'code_generator')
   @ResolveField(() => [AccessCode])
   accessCodes(@Parent() hospital: Hospital): Promise<AccessCode[]> {
+    console.log(hospital);
     return this.service.findAccessCode.load(hospital.id);
   }
 }

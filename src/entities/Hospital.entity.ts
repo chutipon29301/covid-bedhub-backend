@@ -12,33 +12,34 @@ export class Hospital extends PrimaryGeneratedEntity {
   @Column()
   name: string;
 
-  @Field()
-  @Column()
+  @Field({ nullable: true })
+  @Column({ nullable: true })
   subDistrict: string;
 
-  @Field()
-  @Column()
+  @Field({ nullable: true })
+  @Column({ nullable: true })
   district: string;
 
-  @Field()
-  @Column()
+  @Field({ nullable: true })
+  @Column({ nullable: true })
   province: string;
 
-  @Field()
-  @Column()
+  @Field({ nullable: true })
+  @Column({ nullable: true })
   zipCode: string;
 
-  @Field()
-  @Column()
+  @Field({ nullable: true })
+  @Column({ nullable: true })
   tel: string;
 
-  @Field(() => Point)
+  @Field(() => Point, { nullable: true })
   @Column({
     type: 'point',
     transformer: {
       from: v => v,
-      to: v => `${v.x},${v.y}`,
+      to: v => (v ? `${v.x},${v.y}` : undefined),
     },
+    nullable: true,
   })
   location: Point;
 
@@ -50,4 +51,12 @@ export class Hospital extends PrimaryGeneratedEntity {
 
   @OneToMany(() => Officer, o => o.hospital)
   officers?: Officer[];
+
+  @Field()
+  @Column({ default: false })
+  isPage: boolean;
+
+  @Field()
+  @Column({ default: true })
+  isActive: boolean;
 }
