@@ -33,8 +33,8 @@ export class HospitalService extends CrudService<Hospital> {
     const { lat, lng, username, ...body } = data;
     const staffAccessCode = new AccessCode();
     const queueAccessCode = new AccessCode();
-    staffAccessCode.accessCode = nanoid(6);
-    queueAccessCode.accessCode = nanoid(6);
+    staffAccessCode.accessCode = nanoid(6).toUpperCase();
+    queueAccessCode.accessCode = nanoid(6).toUpperCase();
     staffAccessCode.userType = UserType.STAFF;
     queueAccessCode.userType = UserType.QUEUE_MANAGER;
     let location: { x: number; y: number };

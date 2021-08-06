@@ -54,7 +54,6 @@ export class AuthService {
       select: ['id', 'username', 'password', 'role'],
       where: { username },
     });
-    console.log(officer);
     if (!officer) {
       throw new BadRequestException('username or password is incorrect');
     }
