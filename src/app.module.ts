@@ -20,10 +20,12 @@ import { OfficerModule } from './officer/officer.module';
 import { ReporterModule } from './reporter/reporter.module';
 import { AccessCodeModule } from './access-code/access-code.module';
 import { SentryInterceptor } from './sentry.interceptor';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
     TerminusModule,
+    ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
       load: [config],
