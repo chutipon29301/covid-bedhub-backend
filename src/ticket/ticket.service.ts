@@ -1,7 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { In, LessThan, Repository } from 'typeorm';
 import * as DataLoader from 'dataloader';
+import { subDays, format } from 'date-fns';
 import { Vaccine, Symptom, Ticket, TicketStatus, Officer, Patient, Hospital } from '@entity';
 import { CrudService } from '../libs/crud.service';
 import {
@@ -15,6 +16,7 @@ import {
   TicketSortableColumn,
   TicketSortOption,
 } from './dto/ticket.dto';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
 export class TicketService extends CrudService<Ticket> {
@@ -45,6 +47,12 @@ export class TicketService extends CrudService<Ticket> {
       const vaccines = await this.vaccineRepo.find({ where: { ticketId: In([...ids]) } });
       return ids.map(id => vaccines.filter(o => o.id === id));
     });
+  }
+
+  @Cron(CronExpression.EVERY_DAY_AT_1AM)
+  async updateTicketStatus() {
+    const today = format(subDays(new Date(), 14), 'yyyy-MM-dd');
+    await this.repo.update({ examDate: LessThan(today) }, { status: TicketStatus.EXPIRED });
   }
 
   findReporterTicket(reporterId: number, ticketId: number): Promise<Ticket> {

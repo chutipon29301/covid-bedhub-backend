@@ -12,6 +12,7 @@ export enum TicketStatus {
   MATCH = 'MATCH', // Hospital accept
   HOSPITAL_CANCEL = 'HOSPITAL_CANCEL',
   PATIENT_CANCEL = 'PATIENT_CANCEL',
+  EXPIRED = 'EXPIRED',
 }
 registerEnumType(TicketStatus, { name: 'TicketStatus' });
 
